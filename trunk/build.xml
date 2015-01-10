@@ -25,7 +25,24 @@
     <javac srcdir="src/main/java" destdir="${classes}" debug="on" deprecation="false" classpathref="compile.classpath"/>
   </target>
 
-  <target name="build" depends="clean, compile" description="Build this project">
+  <target name="docs" description="Generates docs for projects (javadoc, checkstyle report)">
+    <javadoc destdir="build/docs/api" private="false" linksource="true"
+             overview="docs/api/overview.html"
+             stylesheetfile="docs/api/stylesheet.css"
+             packagenames="sk.rsc.*"
+             doctitle="RSC Sql" windowtitle="RSC Sql javadocs"
+             header="&lt;b&gt;RSC Sql&lt;/b&gt;&lt;font size='-1'&gt; v${version}&lt;/font&gt;">
+
+      <classpath>
+      </classpath>
+
+      <sourcepath>
+        <pathelement location="src/main/java"/>
+      </sourcepath>
+    </javadoc>
+  </target>
+
+  <target name="build" depends="clean, compile, docs" description="Build this project">
     <jar jarfile="build\rscsql-${version}.jar" basedir="${classes}">
       <manifest>
         <attribute name="Implementation-Title" value="RSC Sql library"/>
@@ -33,6 +50,9 @@
         <attribute name="Implementation-Vendor" value="RSC"/>
       </manifest>
     </jar>
+
+    <jar jarfile="build\rscsql-${version}-javadoc.jar" basedir="build/docs/api"/>
+    <jar jarfile="build\rscsql-${version}-sources.jar" basedir="src/main/java"/>
   </target>
 
   <target name="clean" description="Cleans this project">
