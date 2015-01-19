@@ -27,35 +27,23 @@ public abstract class SqlCmd {
 		return this;
 	}
 
-	protected void _log() {
+  /**
+   * Formats sql cmd object state to jdbc form of sql statement (with ? instead of values)
+   * ready to use in prepared statement.
+   *
+   * @return sql command with question marked values
+   */
+  public abstract String toSql();
+
+  public abstract PreparedStatement toStmt() throws SQLException;
+
+  protected void _log() {
 		_log(false);
 	}
 
   protected void _log(boolean important) {
     Sql.getLogger().log(important || logSql, toSql());
   }
-/*
-	protected void _log(boolean important) {
-		if (!sqlLogged) {
-			sqlLogged = true;
-			if (Sql.isSoutLoggerEnabled()) {
-				System.out.println("Executing SQL:\n"+toSql());
-			} else {
-				if (important || logSql || Sql.isSl4jInfoLevel()) {
-					logger.info("Executing SQL:\n{}", toSql());
-				} else if (Sql.isSl4jDebugLevel()) {
-					logger.debug("Executing SQL:\n{}", toSql());
-				} else {
-					logger.trace("Executing SQL:\n{}", toSql());
-				}
-			}
-		}
-	}
-*/
-
-	public abstract String toSql();
-
-	public abstract PreparedStatement toStmt() throws SQLException;
 
 	protected void closeSilent(ResultSet rs) {
 		if (rs != null) {
