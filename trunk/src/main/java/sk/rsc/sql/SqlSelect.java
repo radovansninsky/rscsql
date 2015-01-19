@@ -15,7 +15,7 @@ import java.util.List;
 public final class SqlSelect<T> extends SqlCmd {
 
 	private final List<String> columns = new ArrayList<String>();
-	private String from;
+	private String from = null;
 	private final List<AbstractJoin> joins = new ArrayList<AbstractJoin>();
 	private final List<Restriction> where = new ArrayList<Restriction>();
 	private final List<String> group = new ArrayList<String>();
@@ -262,18 +262,24 @@ public final class SqlSelect<T> extends SqlCmd {
 		return toCountSelect().firstRow().getLong("cnt");
 	}
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
 	public String toSql() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("select\n");
 		for (int i = 0; i < columns.size(); i++) {
 			sb.append("    ").append(columns.get(i)).append(i==columns.size()-1?"\n":",\n");
 		}
-		sb.append("  from\n    ").append(from).append("\n");
-		if (!joins.isEmpty()) {
-			for (AbstractJoin join : joins) {
-				sb.append("      ").append(join.toSql()).append("\n");
-			}
-		}
+    if (from != null && !from.isEmpty()) {
+      sb.append("  from\n    ").append(from).append("\n");
+      if (!joins.isEmpty()) {
+        for (AbstractJoin join : joins) {
+          sb.append("      ").append(join.toSql()).append("\n");
+        }
+      }
+    }
 		if (!where.isEmpty()) {
 			sb.append("  where\n");
 			for (int i = 0; i < where.size(); i++) {
