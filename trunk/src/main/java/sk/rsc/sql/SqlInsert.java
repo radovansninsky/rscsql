@@ -19,6 +19,11 @@ public final class SqlInsert extends SqlParamCmd {
 		this.table = table;
 	}
 
+	public SqlInsert(Connection conn, boolean logSql, String schema, String table) {
+		super(conn, logSql);
+		this.table = schemanizeTable(schema, table);
+	}
+
 	public void execute() throws SQLException {
 		PreparedStatement pst = null;
 		try {

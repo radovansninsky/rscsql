@@ -10,7 +10,7 @@ import java.util.List;
  * Sql select.
  *
  * @author Radovan Sninsky
- * @since 1.0, 5/16/12 10:58 PM
+ * @since 2012-05-16 22:58
  */
 public final class SqlSelect<T> extends SqlCmd {
 
@@ -26,8 +26,18 @@ public final class SqlSelect<T> extends SqlCmd {
 		this.columns.addAll(Arrays.asList(columns));
 	}
 
+	public SqlSelect<T> add(String column) {
+		this.columns.add(column);
+		return this;
+	}
+
 	public SqlSelect<T> from(String from) {
 		this.from = from;
+		return this;
+	}
+
+	public SqlSelect<T> from(String schema, String from) {
+		this.from = schemanizeTable(schema, from);
 		return this;
 	}
 

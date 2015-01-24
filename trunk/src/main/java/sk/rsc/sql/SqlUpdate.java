@@ -25,6 +25,11 @@ public final class SqlUpdate extends SqlParamCmd {
 		this.table = table;
 	}
 
+	public SqlUpdate(Connection conn, boolean logSql, String schema, String table) {
+		super(conn, logSql);
+		this.table = schemanizeTable(schema, table);
+	}
+
 	@Override
 	public SqlUpdate set(String field, Object value) {
 		super.set(field, value);
