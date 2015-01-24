@@ -17,6 +17,8 @@ public class Sql<T> {
 
   private static Logger logger = new NullLogger();
 
+  private static String schema = null;
+
   private final Connection conn;
   private final boolean logSql;
 
@@ -41,16 +43,36 @@ public class Sql<T> {
     logger = customLogger;
   }
 
+  public static void setSchema(String schema) {
+    Sql.schema = schema;
+  }
+
   public SqlSelect<T> select(String... columns) {
     return new SqlSelect<T>(conn, logSql, columns);
   }
 
   public SqlInsert insert(String table) {
-    return new SqlInsert(conn, logSql, table);
+    return insert(Sql.schema, table);
+  }
+
+  public SqlInsert insert(String schema, String table) {
+    return new SqlInsert(conn, logSql, schema, table);
   }
 
   public SqlUpdate update(String table) {
-    return new SqlUpdate(conn, logSql, table);
+    return update(Sql.schema, table);
+  }
+
+  public SqlUpdate update(String schema, String table) {
+    return new SqlUpdate(conn, logSql, schema, table);
+  }
+
+  public SqlDelete delete(String table) {
+    return delete(Sql.schema, table);
+  }
+
+  public SqlDelete delete(String schema, String table) {
+    return new SqlDelete(conn, logSql, schema, table);
   }
 
   public SqlCallable call(String callable, Object... params) {

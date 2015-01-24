@@ -17,6 +17,10 @@ public abstract class SqlCmd {
 	protected final boolean logSql;
 	protected boolean sqlLogged = false;
 
+  protected static String schemanizeTable(String schema, String table) {
+    return schema != null && !schema.isEmpty() ? schema+"."+table : table;
+  }
+
 	SqlCmd(Connection conn, boolean logSql) {
 		this.conn = conn;
 		this.logSql = logSql;
