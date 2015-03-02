@@ -14,8 +14,8 @@ import java.util.Date;
  */
 public class Field {
 
-	private String field;
-	private Object value;
+	protected String field;
+	protected Object value;
 
 	public Field(String field, Object value) {
 		this.field = field;
