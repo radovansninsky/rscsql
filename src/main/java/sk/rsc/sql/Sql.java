@@ -78,4 +78,7 @@ public class Sql<T> {
   public SqlCallable call(String callable, Object... params) {
     return new SqlCallable(conn, logSql, callable).call(params);
   }
+  public SqlCallable call(String callable, int retType, Object... params) {
+    return new SqlCallable(conn, logSql, callable, retType).call(params);
+  }
 }
