@@ -1,5 +1,8 @@
 package sk.rsc.sql;
 
+import sk.rsc.sql.fields.Field;
+import sk.rsc.sql.fields.SqlField;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -20,12 +23,13 @@ public abstract class SqlParamCmd extends SqlCmd {
 		super(conn, logSql);
 	}
 
-	public void execute() throws SQLException {
+	public SqlParamCmd execute() throws SQLException {
 		PreparedStatement pst = null;
 		try {
 			_log(false);
 			pst = toStmt();
 			pst.executeUpdate();
+      return this;
 		} finally {
 			closeSilent(pst);
 		}

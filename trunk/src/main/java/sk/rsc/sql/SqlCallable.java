@@ -1,5 +1,10 @@
 package sk.rsc.sql;
 
+import sk.rsc.sql.fields.Field;
+import sk.rsc.sql.fields.InOutField;
+import sk.rsc.sql.fields.OutField;
+import sk.rsc.sql.fields.SqlField;
+
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +15,9 @@ import java.util.Map;
  * @author Radovan Sninsky
  * @since 20.08.2012 23:32
  */
-public class SqlCallable extends SqlParamCmd {
+public final class SqlCallable extends SqlParamCmd {
 
-  private static final String RET_FIELD_NAME = "ret";
+  private static final String RET_FIELD_NAME = "_$ret_";
 
   private final String proc;
 	private final OutField retField;
@@ -26,22 +31,30 @@ public class SqlCallable extends SqlParamCmd {
 		super(conn, logSql);
 		this.proc = proc;
     this.retField = retType != null ? new OutField(RET_FIELD_NAME, retType) : null;
-//    if (retField != null) {
-//      outFileds.put(retField.field, retField);
-//    }
 	}
 
-  public SqlCallable call(Object... params) {
+  SqlCallable addParams(Object... params) {
     for (Object o : params) {
+      Field f = new Field("", o);
       if (o instanceof OutField) {
-        OutField of = (OutField)o;
-        fields.add(of);
-        outFileds.put(of.field, of);
-      } else {
-        fields.add(new Field("", o));
+        f = (OutField)o;
+        outFileds.put(f.getField(), (OutField)f);
       }
+      fields.add(f);
     }
     return this;
+  }
+
+  public SqlCallable in(Object... params) {
+    return addParams(params);
+  }
+
+  public SqlCallable inOut(String field, Object value, int type) {
+    return addParams(new InOutField(field, value, type));
+  }
+
+  public SqlCallable out(String field, int type) {
+    return addParams(new OutField(field, type));
   }
 
 	@Override
@@ -77,52 +90,42 @@ public class SqlCallable extends SqlParamCmd {
 	}
 
   @Override
-  public void execute() throws SQLException {
+  public SqlCallable execute() throws SQLException {
     CallableStatement cst = null;
     try {
       _log(false);
       cst = (CallableStatement)toStmt();
       cst.executeUpdate();
 
+      int j=0;
       if (retField != null) {
-        retField.setValue(cst.getObject(1));
+        retField.setValue(cst.getObject(++j));
       }
-
-      for (OutField of : outFileds.values()) {
-        if (of.getType() == Types.INTEGER) {
-          of.setValue(cst.getInt(of.getField()));
-        } else if (of.getType() == Types.VARCHAR) {
-          of.setValue(cst.getString(of.getField()));
+      for (Field f : fields) {
+        if (!(f instanceof SqlField)) {
+          ++j;
+          if (f instanceof OutField) {
+            f.setValue(cst.getObject(j));
+//            OutField of = (OutField) f;
+//            if (of.getType() == Types.INTEGER) {
+//              of.setValue(cst.getInt(j));
+//            } else if (of.getType() == Types.VARCHAR) {
+//              of.setValue(cst.getString(j));
+//            }
+          }
         }
       }
+      return this;
     } finally {
       closeSilent(cst);
     }
   }
 
-  public String getReturnValue() {
-    return retField.getValue() instanceof String ? (String)retField.getValue() : null;
-//    return getOutValue(RET_FIELD_NAME);
+  public OutField getReturn() {
+    return retField;
   }
 
-  public Integer getIntReturnValue() {
-    return retField.getValue() instanceof Integer ? (Integer)retField.getValue() : null;
-//    return getIntOutValue(RET_FIELD_NAME);
-  }
-
-  public String getOutValue(String name) {
-    if (outFileds.keySet().contains(name) && outFileds.get(name).getValue() instanceof String) {
-      return (String)outFileds.get(name).getValue();
-    } else {
-      return null;
-    }
-  }
-
-  public Integer getIntOutValue(String name) {
-    if (outFileds.keySet().contains(name) && outFileds.get(name).getValue() instanceof Integer) {
-      return (Integer)outFileds.get(name).getValue();
-    } else {
-      return null;
-    }
+  public OutField getOut(String name) {
+    return outFileds.get(name);
   }
 }

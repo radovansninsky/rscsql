@@ -1,4 +1,4 @@
-package sk.rsc.sql;
+package sk.rsc.sql.fields;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
