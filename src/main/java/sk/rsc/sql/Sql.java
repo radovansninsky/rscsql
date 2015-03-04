@@ -75,10 +75,19 @@ public class Sql<T> {
     return new SqlDelete(conn, logSql, schema, table);
   }
 
-  public SqlCallable call(String callable, Object... params) {
-    return new SqlCallable(conn, logSql, callable).call(params);
+  public SqlCallable call(String callable) {
+    return new SqlCallable(conn, logSql, callable);
   }
+
+  public SqlCallable call(String callable, int retType) {
+    return new SqlCallable(conn, logSql, callable, retType);
+  }
+
+  public SqlCallable call(String callable, Object... params) {
+    return new SqlCallable(conn, logSql, callable).addParams(params);
+  }
+
   public SqlCallable call(String callable, int retType, Object... params) {
-    return new SqlCallable(conn, logSql, callable, retType).call(params);
+    return new SqlCallable(conn, logSql, callable, retType).addParams(params);
   }
 }

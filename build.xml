@@ -4,15 +4,12 @@
   <tstamp><format property="build.time" pattern="yyyy-MM-dd_HH-mm-ss"/></tstamp>
   <buildnumber/>
   <property name="build.no" value="${build.number}"/>
-  <property name="version" value="1.4.${build.no}"/>
+  <property name="version" value="1.5.${build.no}"/>
 
   <property name="ivy.version" value="2.1.0-rc2"/>
   <property name="ivy.home" value="${user.home}/.ant"/>
 
   <property name="classes" value="build/classes"/>
-
-  <path id="compile.classpath">
-  </path>
 
   <path id="test.classpath">
     <pathelement path="lib/testng-6.8.1.jar"/>
@@ -22,7 +19,7 @@
     <ivy:retrieve />
 
     <mkdir dir="${classes}"/>
-    <javac srcdir="src/main/java" destdir="${classes}" debug="on" deprecation="false" classpathref="compile.classpath"/>
+    <javac srcdir="src/main/java" destdir="${classes}" debug="on" deprecation="false"/>
   </target>
 
   <target name="docs" description="Generates docs for projects (javadoc, checkstyle report)">

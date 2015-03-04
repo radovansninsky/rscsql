@@ -1,5 +1,8 @@
 package sk.rsc.sql;
 
+import sk.rsc.sql.fields.Field;
+import sk.rsc.sql.fields.SqlField;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -24,12 +27,13 @@ public final class SqlInsert extends SqlParamCmd {
 		this.table = schemanizeTable(schema, table);
 	}
 
-	public void execute() throws SQLException {
+	public SqlInsert execute() throws SQLException {
 		PreparedStatement pst = null;
 		try {
 			_log(false);
 			pst = toStmt();
 			pst.executeUpdate();
+      return this;
 		} finally {
 			closeSilent(pst);
 		}

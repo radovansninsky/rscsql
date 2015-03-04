@@ -1,5 +1,8 @@
 package sk.rsc.sql;
 
+import sk.rsc.sql.fields.Field;
+import sk.rsc.sql.fields.SqlField;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
