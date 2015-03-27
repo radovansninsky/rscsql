@@ -1,12 +1,16 @@
 package sk.rsc.sql;
 
+import sk.rsc.sql.restrictions.*;
+
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
- * Restriction factory.
+ * Restriction factory, simplify writing where clauses.
  *
  * @author Radovan Sninsky
- * @since 1.0, 5/21/12 6:00 PM
+ * @since 21.05.2012 18:00
  */
 public final class Restrictions {
 
@@ -36,5 +40,13 @@ public final class Restrictions {
 
 	public static Restriction sql(String text) {
 		return new NativeRestriction(text);
+	}
+
+	public static Restriction in(String field, Object... values) {
+		return new InRestriction(field, Arrays.asList(values));
+	}
+
+	public static Restriction in(String field, List<Object> values) {
+		return new InRestriction(field, values);
 	}
 }

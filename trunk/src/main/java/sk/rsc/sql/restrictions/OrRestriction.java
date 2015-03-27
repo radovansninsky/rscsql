@@ -1,4 +1,4 @@
-package sk.rsc.sql;
+package sk.rsc.sql.restrictions;
 
 import java.util.ArrayList;
 import java.util.List;
