@@ -1,14 +1,14 @@
-package sk.rsc.sql;
+package sk.rsc.sql.restrictions;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * Between restriction.
+ * Represents sql between operation, if field is between two dates.
  *
  * @author Radovan Sninsky
- * @since 1.0, 6/13/12 10:21 PM
+ * @since 13.06.2012 22:21
  */
 public class BetweenRestriction implements Restriction {
 

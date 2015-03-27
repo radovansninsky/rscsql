@@ -2,6 +2,7 @@ package sk.rsc.sql;
 
 import sk.rsc.sql.fields.Field;
 import sk.rsc.sql.fields.SqlField;
+import sk.rsc.sql.restrictions.Restriction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

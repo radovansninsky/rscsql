@@ -1,5 +1,7 @@
 package sk.rsc.sql;
 
+import sk.rsc.sql.restrictions.Restriction;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
