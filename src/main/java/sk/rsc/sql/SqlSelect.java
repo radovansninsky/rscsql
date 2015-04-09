@@ -14,12 +14,14 @@ import java.util.List;
  * @author Radovan Sninsky
  * @since 2012-05-16 22:58
  */
+@SuppressWarnings("unused")
 public final class SqlSelect<T> extends SqlCmd {
 
 	private final List<String> columns = new ArrayList<String>();
 	private String from = null;
+	private SqlSelect<T> fromSelect = null;
 	private final List<AbstractJoin> joins = new ArrayList<AbstractJoin>();
-	private final List<Restriction> where = new ArrayList<Restriction>();
+	final List<Restriction> where = new ArrayList<Restriction>();
 	private final List<String> group = new ArrayList<String>();
 	private final List<Order> order = new ArrayList<Order>();
 
@@ -40,6 +42,12 @@ public final class SqlSelect<T> extends SqlCmd {
 
 	public SqlSelect<T> from(String schema, String from) {
 		this.from = schemanizeTable(schema, from);
+		return this;
+	}
+
+	public SqlSelect<T> from(SqlSelect<T> select, String as) {
+		this.from = "(" + select.toSql() + ") " + as;
+		this.fromSelect = select;
 		return this;
 	}
 
@@ -244,6 +252,23 @@ public final class SqlSelect<T> extends SqlCmd {
 	public PreparedStatement toStmt() throws SQLException {
 		PreparedStatement stmt = conn.prepareStatement(toSql());
 		int j=0;
+		if (fromSelect != null) {
+			for (Restriction r : fromSelect.where) {
+				if (r.hasValues()) {
+					for (Object val : r.getValues()) {
+						if (val instanceof Date) {
+							stmt.setTimestamp(++j, new Timestamp(((Date) val).getTime()));
+						} else {
+							if (val != null) {
+								stmt.setObject(++j, val);
+							} else {
+								stmt.setNull(++j, Types.VARCHAR);
+							}
+						}
+					}
+				}
+			}
+		}
 		for (Restriction r : where) {
 			if (r.hasValues()) {
 				for (Object val : r.getValues()) {
