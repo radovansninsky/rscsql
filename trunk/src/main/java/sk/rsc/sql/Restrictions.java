@@ -42,11 +42,11 @@ public final class Restrictions {
 		return new NativeRestriction(text);
 	}
 
+  public static Restriction in(String field, List values) {
+    return new InRestriction(field, values);
+  }
+
 	public static Restriction in(String field, Object... values) {
 		return new InRestriction(field, Arrays.asList(values));
-	}
-
-	public static Restriction in(String field, List<Object> values) {
-		return new InRestriction(field, values);
 	}
 }

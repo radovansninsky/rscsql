@@ -9,17 +9,14 @@
   <property name="ivy.version" value="2.1.0-rc2"/>
   <property name="ivy.home" value="${user.home}/.ant"/>
 
-  <property name="classes" value="build/classes"/>
-
-  <path id="test.classpath">
-    <pathelement path="lib/testng-6.8.1.jar"/>
-  </path>
+  <property name="main.classes" value="build/classes/main"/>
+  <property name="test.classes" value="build/classes/test"/>
 
   <target name="compile" depends="ivy-init" description="Prepare directories">
     <ivy:retrieve />
 
-    <mkdir dir="${classes}"/>
-    <javac srcdir="src/main/java" destdir="${classes}" debug="on" deprecation="false"/>
+    <mkdir dir="${main.classes}"/>
+    <javac srcdir="src/main/java" destdir="${main.classes}" debug="on" deprecation="false"/>
   </target>
 
   <target name="docs" description="Generates docs for projects (javadoc, checkstyle report)">
@@ -39,8 +36,8 @@
     </javadoc>
   </target>
 
-  <target name="build" depends="clean, compile, docs" description="Build this project">
-    <jar jarfile="build\rscsql-${version}.jar" basedir="${classes}">
+  <target name="build" depends="clean, compile, test, docs" description="Build this project">
+    <jar jarfile="build\rscsql-${version}.jar" basedir="${main.classes}">
       <manifest>
         <attribute name="Implementation-Title" value="RSC Sql library"/>
         <attribute name="Implementation-Version" value="${version}"/>
@@ -55,6 +52,32 @@
   <target name="clean" description="Cleans this project">
     <delete dir="lib" failonerror="false"/>
     <delete dir="build" failonerror="false"/>
+  </target>
+
+  <!-- Tests -->
+  <target name="test" depends="compile" description="Run tests">
+    <mkdir dir="${test.classes}"/>
+    <javac srcdir="src/test/java" destdir="${test.classes}" debug="on" deprecation="false">
+      <classpath>
+        <pathelement location="${main.classes}"/>
+        <pathelement path="lib/testng-6.8.1.jar"/>
+      </classpath>
+    </javac>
+
+    <taskdef resource="testngtasks" classpath="lib/testng-6.8.1.jar"/>
+
+    <testng workingdir="${basedir}" outputdir="build/test-output" haltonfailure="true" verbose="2">
+      <xmlfileset file="src/test/testng.xml"/>
+      <!--<sourcedir location="src"/>-->
+      <classpath>
+        <pathelement location="${main.classes}"/>
+        <pathelement location="${test.classes}"/>
+
+        <!-- test libs -->
+        <pathelement location="lib/h2-1.4.184.jar"/>
+        <pathelement location="lib/jcommander-1.27.jar"/>
+      </classpath>
+    </testng>
   </target>
 
   <!-- Apache Ivy -->

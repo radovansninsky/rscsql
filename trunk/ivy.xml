@@ -3,5 +3,6 @@
   <dependencies>
     <dependency org="com.h2database" name="h2" rev="1.4.184" transitive="false"/>
     <dependency org="org.testng" name="testng" rev="6.8.1" transitive="false"/>
+    <dependency org="com.beust" name="jcommander" rev="1.27" transitive="false"/>
   </dependencies>
 </ivy-module>

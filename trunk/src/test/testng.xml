@@ -1,0 +1,16 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="RscSqlTestSuite" verbose="2" annotations="JDK">
+  <test name="All tests">
+    <groups>
+      <run>
+        <exclude name="oracle"/>
+      </run>
+    </groups>
+    <classes>
+      <class name="sk.rsc.sql.test.CallTest"/>
+      <class name="sk.rsc.sql.test.InsertTest"/>
+      <class name="sk.rsc.sql.test.UpdateTest"/>
+      <class name="sk.rsc.sql.test.SelectTest"/>
+    </classes>
+  </test>
+</suite>

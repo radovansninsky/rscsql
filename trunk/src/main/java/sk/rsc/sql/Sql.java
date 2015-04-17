@@ -1,7 +1,7 @@
 package sk.rsc.sql;
 
 import sk.rsc.sql.logging.Logger;
-import sk.rsc.sql.logging.NullLogger;
+import sk.rsc.sql.logging.NoLogger;
 import sk.rsc.sql.logging.SoutLogger;
 
 import java.sql.Connection;
@@ -15,7 +15,7 @@ import java.sql.Connection;
 @SuppressWarnings("UnusedDeclaration")
 public class Sql<T> {
 
-  private static Logger logger = new NullLogger();
+  private static Logger logger = new NoLogger();
 
   private static String schema = null;
 
@@ -35,10 +35,26 @@ public class Sql<T> {
     return logger;
   }
 
+  /**
+   * Sets {@link SoutLogger} as logger for library.
+   */
   public static void setSoutLogger() {
     logger = new SoutLogger();
   }
 
+  /**
+   * Sets custom {@link Logger} as logger for library.
+   * <br/>
+   * <pre>
+   *   Sql.setCustomLogger(new Logger() {
+   *     void log(boolean important, String message) {
+   *       // custom implementation
+   *     }
+   *   });
+   * </pre>
+   *
+   * @param customLogger instance of custom logger implementation
+   */
   public static void setCustomLogger(Logger customLogger) {
     logger = customLogger;
   }
