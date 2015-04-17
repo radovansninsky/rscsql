@@ -33,7 +33,7 @@ public class CallTest {
   private Connection conn;
   private Connection orclConn;
 
-  @BeforeClass
+  @BeforeClass(groups = {"h2"})
   public void setUp() throws SQLException {
     Sql.setSoutLogger();
 
@@ -50,7 +50,7 @@ public class CallTest {
     }
   }
 
-  @AfterClass
+  @AfterClass(groups = {"h2"})
   public void tearDown() {
     if (conn != null) { try { conn.close(); } catch (Throwable t) { } }
   }
@@ -66,7 +66,7 @@ public class CallTest {
     if (orclConn != null) { try { orclConn.close(); } catch (Throwable t) { } }
   }
 
-  @Test
+  @Test(groups = {"h2"})
   public void test1() throws SQLException {
     new Sql(conn, true).call("proc_1").execute();
     new Sql(conn, true).call("proc_2", "nieco", 18).execute();

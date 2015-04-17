@@ -1,5 +1,6 @@
 package sk.rsc.sql.restrictions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,9 +12,9 @@ import java.util.List;
 public class InRestriction implements Restriction {
 
   private String field;
-  private List<Object> values;
+  private List values;
 
-  public InRestriction(String field, List<Object> values) {
+  public InRestriction(String field, List values) {
     this.field = field;
     this.values = values;
   }
@@ -29,7 +30,7 @@ public class InRestriction implements Restriction {
 
   @Override
   public List<Object> getValues() {
-    return values;
+    return new ArrayList<Object>(values);
   }
 
   @Override
