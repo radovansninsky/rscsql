@@ -51,7 +51,7 @@ public final class SqlDelete extends SqlCmd {
   @Override
   public String toSql() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("delete ").append(table).append("\n  set\n    ");
+    sb.append("delete ").append(table);
     sb.append("\n");
     if (!where.isEmpty()) {
       sb.append("  where\n");
