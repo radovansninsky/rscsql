@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Restriction factory, simplify writing where clauses.
+ * It is recomended to import class staticaly.
  *
  * @author Radovan Sninsky
  * @since 21.05.2012 18:00
@@ -19,6 +20,10 @@ public final class Restrictions {
 	}
 
 	public static Restriction startWith(String field, String value) {
+		return new SimpleRestriction(field, Op.LIKE, value+"%");
+	}
+
+	public static Restriction endWith(String field, String value) {
 		return new SimpleRestriction(field, Op.LIKE, value+"%");
 	}
 
