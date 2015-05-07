@@ -1,18 +1,18 @@
 package sk.rsc.sql.test;
 
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import sk.rsc.sql.Restrictions;
+import sk.rsc.sql.Row;
 import sk.rsc.sql.Sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import static org.testng.Assert.*;
@@ -44,6 +44,9 @@ public class SelectTest {
       stmt.executeUpdate("insert into test1 (num1, num2) values (4, 3)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (5, 3)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (6, 3)");
+
+      stmt.executeUpdate("insert into test1 (desc, now) values ('1st date', '2015-04-08 11:22:33.888')");
+      stmt.executeUpdate("insert into test1 (desc, now) values ('2nd date', '2015-04-08 22:33:44.888')");
     } finally {
       if (stmt != null) {
         stmt.close();
@@ -69,6 +72,7 @@ public class SelectTest {
 
     assertEquals(list.size(), 3);
   }
+
   @Test
   public void testInList() throws SQLException {
     List list = new Sql(conn, true).select("*").from("test1")
@@ -76,5 +80,31 @@ public class SelectTest {
       .list();
 
     assertEquals(list.size(), 5);
+  }
+
+  @Test
+  public void testBefore() throws SQLException {
+    Calendar c = Calendar.getInstance();
+    c.set(2015, Calendar.APRIL, 8, 15, 12, 13);
+
+    List<Row> list = new Sql<Row>(conn, true).select("*").from("test1")
+      .where(Restrictions.before("now", c.getTime()))
+      .list();
+
+    assertEquals(list.size(), 1);
+    assertEquals(list.get(0).get("desc"), "1st date");
+  }
+
+  @Test
+  public void testAfter() throws SQLException {
+    Calendar c = Calendar.getInstance();
+    c.set(2015, Calendar.APRIL, 8, 15, 12, 13);
+
+    List<Row> list = new Sql<Row>(conn, true).select("*").from("test1")
+      .where(Restrictions.after("now", c.getTime()))
+      .list();
+
+    assertEquals(list.size(), 1);
+    assertEquals(list.get(0).get("desc"), "2nd date");
   }
 }
