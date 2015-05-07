@@ -10,32 +10,32 @@ import java.io.Serializable;
  */
 public enum Op implements Serializable {
 
-	EQ("="),
-	NE("!="),
-	GT(">"),
-	GE(">="),
-	LT("<"),
-	LE("<="),
-	LIKE("like"),
-	NLIKE("not like"),
-	ISNULL("is null"),
-	ISNOTNULL("is not null"),
-	OR("or");
+  EQ("="),
+  NE("!="),
+  GT(">"),
+  GE(">="),
+  LT("<"),
+  LE("<="),
+  LIKE("like"),
+  NLIKE("not like"),
+  ISNULL("is null"),
+  ISNOTNULL("is not null"),
+  OR("or");
 
-	private String op;
+  private String op;
 
-	Op() {
-	}
+  Op() {
+  }
 
-	Op(String op) {
-		this.op = op;
-	}
+  Op(String op) {
+    this.op = op;
+  }
 
-	public String getOp() {
-		return op;
-	}
+  public String getOp() {
+    return op;
+  }
 
-	public void setOp(String op) {
-		this.op = op;
-	}
+  public void setOp(String op) {
+    this.op = op;
+  }
 }
