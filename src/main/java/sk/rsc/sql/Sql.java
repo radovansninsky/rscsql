@@ -13,11 +13,12 @@ import java.sql.Connection;
  * @since 2012-05-16 22:09
  */
 @SuppressWarnings("UnusedDeclaration")
-public class Sql<T> {
+public final class Sql<T> {
 
   private static Logger logger = new NoLogger();
 
   private static String schema = null;
+  private static boolean isMockMode = false;
 
   private final Connection conn;
   private final boolean logSql;
@@ -59,12 +60,20 @@ public class Sql<T> {
     logger = customLogger;
   }
 
+  public static void setMockMode(boolean isMockMode) {
+    Sql.isMockMode = isMockMode;
+  }
+
+  public static void enableMockMode() {
+    setMockMode(true);
+  }
+
   public static void setSchema(String schema) {
     Sql.schema = schema;
   }
 
   public SqlSelect<T> select(String... columns) {
-    return new SqlSelect<T>(conn, logSql, columns);
+    return new SqlSelect<T>(conn, logSql, Sql.isMockMode, columns);
   }
 
   public SqlInsert insert(String table) {
@@ -72,7 +81,7 @@ public class Sql<T> {
   }
 
   public SqlInsert insert(String schema, String table) {
-    return new SqlInsert(conn, logSql, schema, table);
+    return new SqlInsert(conn, logSql, Sql.isMockMode, schema, table);
   }
 
   public SqlUpdate update(String table) {
@@ -80,7 +89,7 @@ public class Sql<T> {
   }
 
   public SqlUpdate update(String schema, String table) {
-    return new SqlUpdate(conn, logSql, schema, table);
+    return new SqlUpdate(conn, logSql, Sql.isMockMode, schema, table);
   }
 
   public SqlDelete delete(String table) {
@@ -88,22 +97,22 @@ public class Sql<T> {
   }
 
   public SqlDelete delete(String schema, String table) {
-    return new SqlDelete(conn, logSql, schema, table);
+    return new SqlDelete(conn, logSql, Sql.isMockMode, schema, table);
   }
 
   public SqlCallable call(String callable) {
-    return new SqlCallable(conn, logSql, callable);
+    return new SqlCallable(conn, logSql, Sql.isMockMode, callable);
   }
 
   public SqlCallable call(String callable, int retType) {
-    return new SqlCallable(conn, logSql, callable, retType);
+    return new SqlCallable(conn, logSql, Sql.isMockMode, callable, retType);
   }
 
   public SqlCallable call(String callable, Object... params) {
-    return new SqlCallable(conn, logSql, callable).addParams(params);
+    return new SqlCallable(conn, logSql, Sql.isMockMode, callable).addParams(params);
   }
 
   public SqlCallable call(String callable, int retType, Object... params) {
-    return new SqlCallable(conn, logSql, callable, retType).addParams(params);
+    return new SqlCallable(conn, logSql, Sql.isMockMode, callable, retType).addParams(params);
   }
 }

@@ -22,13 +22,12 @@ public final class SqlDelete extends SqlCmd {
   private final String table;
   private final List<Restriction> where = new ArrayList<Restriction>();
 
-  public SqlDelete(Connection conn, boolean logSql, String table) {
-    super(conn, logSql);
-    this.table = table;
+  public SqlDelete(Connection conn, boolean logSql, boolean isMockMode, String table) {
+    this(conn, logSql, isMockMode, null, table);
   }
 
-  public SqlDelete(Connection conn, boolean logSql, String schema, String table) {
-    super(conn, logSql);
+  public SqlDelete(Connection conn, boolean logSql, boolean isMockMode, String schema, String table) {
+    super(conn, logSql, isMockMode);
     this.table = schemanizeTable(schema, table);
   }
 
@@ -41,8 +40,10 @@ public final class SqlDelete extends SqlCmd {
     PreparedStatement pst = null;
     try {
       _log(false);
-      pst = toStmt();
-      pst.executeUpdate();
+      if (!isMockMode) {
+        pst = toStmt();
+        pst.executeUpdate();
+      }
     } finally {
       closeSilent(pst);
     }

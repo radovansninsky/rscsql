@@ -14,7 +14,7 @@ package sk.rsc.sql.logging;
  * @since 2014-04-27 21:09
  * @see Logger for interface definition
  */
-public class SoutLogger implements Logger {
+public final class SoutLogger implements Logger {
 
   @Override
   public void log(boolean important, String message) {

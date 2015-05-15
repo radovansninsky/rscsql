@@ -9,7 +9,7 @@ import java.util.List;
  * @author Radovan Sninsky
  * @since 2015-03-27 13:37
  */
-public class InRestriction implements Restriction {
+public final class InRestriction implements Restriction {
 
   private String field;
   private List values;
