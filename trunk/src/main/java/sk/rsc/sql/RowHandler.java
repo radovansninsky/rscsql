@@ -3,10 +3,11 @@ package sk.rsc.sql;
 import java.sql.SQLException;
 
 /**
- * Trieda RowHandler.
+ * Handles object represents one row in selected table when selected by {@link SqlSelect}.
  *
  * @author Radovan Sninsky
- * @since 9.4.2013 15:23
+ * @since 2013-04-09 15:23
+ * @see SqlSelect#iterate(RowHandler) and similar for usage
  */
 public abstract class RowHandler<T> {
 

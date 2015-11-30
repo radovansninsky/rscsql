@@ -6,7 +6,7 @@ import java.util.List;
  * Restriction interface for sql command objects to work with.
  *
  * @author Radovan Sninsky
- * @since 21.05.2012 17:56
+ * @since 2012-05-21 17:56
  */
 public interface Restriction {
 

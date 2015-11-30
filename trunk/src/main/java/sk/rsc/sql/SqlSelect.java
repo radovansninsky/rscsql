@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Sql select.
+ * Sql command SELECT ... FROM table JOIN ... WHERE ....
  *
  * @author Radovan Sninsky
  * @since 2012-05-16 22:58

@@ -1,10 +1,11 @@
 package sk.rsc.sql;
 
 /**
- * Order.
+ * Order clause in SQL SELECT command.
  *
  * @author Radovan Sninsky
- * @since 1.0, 5/16/12 11:12 PM
+ * @since 2012-05-16 23:12
+ * @see SqlSelect for usage
  */
 public final class Order {
 

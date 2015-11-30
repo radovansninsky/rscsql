@@ -6,7 +6,7 @@ import java.util.List;
  * Native restriction.
  *
  * @author Radovan Sninsky
- * @since 1.0, 5/21/12 5:59 PM
+ * @since 2012-05-21 17:59
  */
 public final class NativeRestriction implements Restriction {
 

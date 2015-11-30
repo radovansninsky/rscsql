@@ -6,6 +6,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import sk.rsc.sql.Sql;
 import sk.rsc.sql.SqlCallable;
+import sk.rsc.sql.SqlInsert;
 
 import java.sql.*;
 
@@ -30,6 +31,32 @@ public class OracleCallTest {
     if (conn != null) { try { conn.close(); } catch (Exception e) { } }
   }
 
+	@Test(groups = {"oracle"})
+	public void testInsert1() throws SQLException {
+		PreparedStatement pst = null;
+		try {
+			pst = conn.prepareStatement("insert into tab3_ret (name, cislo) values (?, ?)", new String[] {"id"});
+			pst.setString(1, "s46");
+			pst.setInt(2, 46);
+			pst.execute();
+
+			ResultSet genKeys = pst.getGeneratedKeys();
+			while (genKeys.next()) {
+				System.out.println("key: " + genKeys.getString(1));
+			}
+			genKeys.close();
+		} finally {
+			pst.close();
+		}
+	}
+
+	@Test(groups = {"oracle"})
+	public void testInsert2() throws SQLException {
+		SqlInsert insert = new Sql(conn).insert("tab3_ret");
+		insert.setGeneratedKey("id", Types.INTEGER).set("name", "s89").set("cislo", 66).execute();
+		System.out.println("insert.getGeneratedKey() = " + insert.getGeneratedKey().asInt());
+	}
+
   @DataProvider(name = "dp1")
   public Object[][] td1() {
     return new Object[][] {
@@ -40,7 +67,7 @@ public class OracleCallTest {
     };
   }
 
-  @Test(dataProvider = "dp1", groups = {"oracle"})
+  @Test(enabled = false, dataProvider = "dp1", groups = {"oracle"})
   public void test1(long gtId, String ixnId, String sn, String cn, long catId, String from, String sub, String txt,
                     String ntfNum, String prfComm, String login, String agent, String idpos, String cntByPhone,
                     String cntByEmail, String rcIco, String idCode, String userId, boolean ntfByEmail, boolean ntfBySms)
@@ -63,7 +90,7 @@ public class OracleCallTest {
     System.out.println("  out4:           " + call.getOut("out4"));
   }
 
-  @Test(dataProvider = "dp1", groups = {"oracle"})
+  @Test(enabled = false, dataProvider = "dp1", groups = {"oracle"})
   public void testPlainJdbc(long gtId, String ixnId, String sn, String cn, long catId, String from, String sub, String txt,
                     String ntfNum, String prfComm, String login, String agent, String idpos, String cntByPhone,
                     String cntByEmail, String rcIco, String idCode, String userId, boolean ntfByEmail, boolean ntfBySms)
@@ -114,7 +141,7 @@ public class OracleCallTest {
     }
   }
 
-  @Test(dataProvider = "dp1", groups = {"oracle"})
+  @Test(enabled = false, dataProvider = "dp1", groups = {"oracle"})
   public void testPlainJdbcOld(long gtId, String ixnId, String sn, String cn, long catId, String from, String sub, String txt,
                     String ntfNum, String prfComm, String login, String agent, String idpos, String cntByPhone,
                     String cntByEmail, String rcIco, String idCode, String userId, boolean ntfByEmail, boolean ntfBySms)

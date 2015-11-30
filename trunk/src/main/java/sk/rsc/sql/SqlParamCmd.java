@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Sql parametrized command.
+ * Parametrized SQL command, parent INSERT, UPDATE and CALL.
  *
  * @author Radovan Sninsky
- * @since 1.0, 7/14/12 11:04 AM
+ * @since 2012-07-14 11:04
  */
 public abstract class SqlParamCmd extends SqlCmd {
 

@@ -8,7 +8,7 @@ import java.util.List;
  * Represents sql between operation, if field is between two dates.
  *
  * @author Radovan Sninsky
- * @since 13.06.2012 22:21
+ * @since 2012-06-13 22:21
  */
 public final class BetweenRestriction implements Restriction {
 

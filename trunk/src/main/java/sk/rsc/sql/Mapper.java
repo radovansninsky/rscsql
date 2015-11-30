@@ -5,10 +5,11 @@ import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * Mapper.
+ * Maps JDBC {@link ResultSet} to generics object.
  *
  * @author Radovan Sninsky
- * @since 24.05.2012 16:57
+ * @since 2012-05-24 16:57
+ * @see SqlSelect#list(Mapper) and simimlar for usage
  */
 public abstract class Mapper<T> {
 

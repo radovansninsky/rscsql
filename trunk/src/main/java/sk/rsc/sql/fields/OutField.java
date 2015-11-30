@@ -6,10 +6,10 @@ import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * Trieda OutField.
+ * Out field.
  *
  * @author Radovan Sninsky
- * @since 11.10.2013 12:23
+ * @since 2013-10-11 12:23
  */
 public class OutField extends Field {
 

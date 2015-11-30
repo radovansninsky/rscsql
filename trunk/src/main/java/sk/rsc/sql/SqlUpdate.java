@@ -14,10 +14,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Sql Update.
+ * Sql command UPDATE table SET ... WHERE ....
  *
  * @author Radovan Sninsky
- * @since 1.0, 7/9/12 10:12 PM
+ * @since 2012-07-09 22:12
  */
 public final class SqlUpdate extends SqlParamCmd {
 

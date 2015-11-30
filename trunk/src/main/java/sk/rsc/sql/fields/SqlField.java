@@ -4,10 +4,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Trieda XXX.
+ * SqlField.
  *
  * @author Radovan Sninsky
- * @since 1.0, 7/14/12 12:15 AM
+ * @since 2012-07-14 12:15
  */
 public class SqlField extends Field {
 

@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Sql Command.
+ * Abstract SQL command, parent for all other SQL commands.
  *
  * @author Radovan Sninsky
  * @since 2012-09-07 12:18

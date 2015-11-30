@@ -5,6 +5,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import sk.rsc.sql.Sql;
+import sk.rsc.sql.SqlInsert;
 
 import java.sql.*;
 import java.util.logging.Level;
@@ -19,7 +20,7 @@ import java.util.logging.Logger;
 public class InsertTest {
 
 	private static final String CREATE_TABLE =
-		"create table test1 (desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2))";
+		"create table test1 (id identity, desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2))";
 
 	private Connection conn;
 
@@ -59,6 +60,24 @@ public class InsertTest {
 		rs.next();
 		Assert.assertEquals(rs.getString("desc"), "this is a description text");
 		Assert.assertEquals(rs.getInt("num1"), 326);
+		rs.close();
+		s.close();
+	}
+
+	@Test
+	public void test2() throws SQLException {
+		SqlInsert i = new Sql(conn, true).insert("test1");
+		i.setGeneratedKey("id", Types.INTEGER)
+			.set("desc", "desc2")
+			.set("now", new java.util.Date())
+			.execute();
+		int id = i.getGeneratedKey().asInt();
+
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery("select * from test1 where id = "+id);
+		rs.next();
+		Assert.assertEquals(rs.getInt("id"), id);
+		Assert.assertEquals(rs.getString("desc"), "desc2");
 		rs.close();
 		s.close();
 	}

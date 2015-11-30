@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * SqlDelete.
+ * Sql command DELETE FROM table WHERE ....
  *
  * @author Radovan Sninsky
  * @since 2015-01-23 15:20
