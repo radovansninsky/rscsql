@@ -7,7 +7,7 @@ import java.util.List;
  * Or Restriction.
  *
  * @author Radovan Sninsky
- * @since 30.07.2012 11:29
+ * @since 2012-07-30 11:29
  */
 public final class OrRestriction implements Restriction {
 

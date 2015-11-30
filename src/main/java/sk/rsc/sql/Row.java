@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Row.
+ * Row returned by {@link SqlSelect} when no generic class is provided.
  *
  * @author Radovan Sninsky
- * @since 25.05.2012 11:55
+ * @since 2012-05-25 11:55
  */
 public final class Row {
 

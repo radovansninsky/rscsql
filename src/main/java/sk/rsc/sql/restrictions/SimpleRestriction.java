@@ -4,10 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * SimpleRestriction.
+ * Simple restriction for field based on single operation represented by {@link Op} and value.
  *
  * @author Radovan Sninsky
- * @since 1.0, 5/16/12 11:11 PM
+ * @since 2012-05-16 23:11
+ * @see Op for operations definition
  */
 public final class SimpleRestriction implements Restriction {
 

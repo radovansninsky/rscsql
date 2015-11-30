@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * SqlCallable.
+ * Sql command CALL storedprocedure(...).
  *
  * @author Radovan Sninsky
- * @since 20.08.2012 23:32
+ * @since 2012-08-20 23:32
  */
 public final class SqlCallable extends SqlParamCmd {
 
@@ -21,7 +21,7 @@ public final class SqlCallable extends SqlParamCmd {
 
   private final String proc;
   private final OutField retField;
-  private final Map<String, OutField> outFileds = new HashMap<String, OutField>();
+  private final Map<String, OutField> outFields = new HashMap<String, OutField>();
 
   public SqlCallable(Connection conn, boolean logSql, boolean isMockMode, String proc) {
     this(conn, logSql, isMockMode, proc, null);
@@ -38,7 +38,7 @@ public final class SqlCallable extends SqlParamCmd {
       Field f = new Field("", o);
       if (o instanceof OutField) {
         f = (OutField) o;
-        outFileds.put(f.getField(), (OutField) f);
+        outFields.put(f.getField(), (OutField) f);
       }
       fields.add(f);
     }
@@ -125,6 +125,6 @@ public final class SqlCallable extends SqlParamCmd {
   }
 
   public OutField getOut(String name) {
-    return outFileds.get(name);
+    return outFields.get(name);
   }
 }

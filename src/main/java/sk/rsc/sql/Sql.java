@@ -7,7 +7,7 @@ import sk.rsc.sql.logging.SoutLogger;
 import java.sql.Connection;
 
 /**
- * Sql.
+ * Main library entry class.
  *
  * @author Radovan Sninsky
  * @since 2012-05-16 22:09

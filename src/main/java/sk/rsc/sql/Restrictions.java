@@ -11,7 +11,7 @@ import java.util.List;
  * It is recomended to import class staticaly.
  *
  * @author Radovan Sninsky
- * @since 21.05.2012 18:00
+ * @since 2012-05-21 18:00
  */
 @SuppressWarnings("unused")
 public final class Restrictions {

@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * InOut.
+ * InOut field.
  *
  * @author Radovan Sninsky
  * @since 2015-03-04 21:13

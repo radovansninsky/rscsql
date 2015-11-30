@@ -3,10 +3,12 @@ package sk.rsc.sql.restrictions;
 import java.io.Serializable;
 
 /**
- * Op.
+ * Represents simple sql operation like greater, equals, etc..
  *
  * @author Radovan Sninsky
- * @since 1.0, 5/18/12 10:12 AM
+ * @since 2012-05-18 10:12
+ * @see SimpleRestriction for usage
+ * @see sk.rsc.sql.Restrictions factory for field restrictions
  */
 public enum Op implements Serializable {
 
@@ -23,9 +25,6 @@ public enum Op implements Serializable {
   OR("or");
 
   private String op;
-
-  Op() {
-  }
 
   Op(String op) {
     this.op = op;
