@@ -1,8 +1,6 @@
 package sk.rsc.sql;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Row returned by {@link SqlSelect} when no generic class is provided.
@@ -14,21 +12,21 @@ public final class Row {
 
   public static final Row EMPTY = new Row();
 
-  private Map<String, Object> map = new HashMap<String, Object>();
+  private Map<String, Object> nameMap = new HashMap<String, Object>();
 
   public Row() {
   }
 
   public void set(String column, Object value) {
-    map.put(column, value);
+    nameMap.put(column, value);
   }
 
   public Object getObject(String column) {
-    return map.get(column);
+    return nameMap.get(column);
   }
 
   public boolean isNull(String column) {
-    return map.get(column) == null;
+    return nameMap.get(column) == null;
   }
 
   public String get(String column) {
@@ -36,12 +34,12 @@ public final class Row {
   }
 
   public String getString(String column) {
-    Object value = map.get(column);
+    Object value = nameMap.get(column);
     return value == null ? null : value.toString();
   }
 
   public Integer getInt(String column) {
-    Object value = map.get(column);
+    Object value = nameMap.get(column);
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -54,7 +52,7 @@ public final class Row {
   }
 
   public Long getLong(String column) {
-    Object value = map.get(column);
+    Object value = nameMap.get(column);
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -67,7 +65,7 @@ public final class Row {
   }
 
   public Date getDate(String column) {
-    Object value = map.get(column);
+    Object value = nameMap.get(column);
     if (value == null) {
       return null;
     } else if (value instanceof java.sql.Date) {
@@ -78,4 +76,8 @@ public final class Row {
       throw new IllegalArgumentException("Can't convert to date");
     }
   }
+
+	public List<String> listColumns() {
+		return new ArrayList<String>(nameMap.keySet());
+	}
 }
