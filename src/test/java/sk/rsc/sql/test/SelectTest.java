@@ -3,6 +3,7 @@ package sk.rsc.sql.test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import sk.rsc.sql.Mapper;
 import sk.rsc.sql.Restrictions;
 import sk.rsc.sql.Row;
 import sk.rsc.sql.Sql;
@@ -13,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static org.testng.Assert.*;
@@ -44,9 +46,15 @@ public class SelectTest {
       stmt.executeUpdate("insert into test1 (num1, num2) values (4, 3)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (5, 3)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (6, 3)");
-
       stmt.executeUpdate("insert into test1 (desc, now) values ('1st date', '2015-04-08 11:22:33.888')");
       stmt.executeUpdate("insert into test1 (desc, now) values ('2nd date', '2015-04-08 22:33:44.888')");
+      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc1', 10)");
+      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc2', 20)");
+      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc3', 30)");
+      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc10', 216.46)");
+      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc20', 226.46)");
+      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc30', 236.46)");
+      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc40', 246.46)");
     } finally {
       if (stmt != null) {
         stmt.close();
@@ -59,12 +67,12 @@ public class SelectTest {
     if (conn != null) { try { conn.close(); } catch (Throwable t) { } }
   }
 
-  @Test
+  @Test(enabled = false)
   public void testNoFrom() throws SQLException {
     assertEquals(new Sql(conn, true).select("1").firstRow().get("1"), "1");
   }
 
-  @Test
+  @Test(enabled = false)
   public void testInVararray() throws SQLException {
     List list = new Sql(conn, true).select("*").from("test1")
       .where(Restrictions.in("num2", 1, 2))
@@ -73,7 +81,7 @@ public class SelectTest {
     assertEquals(list.size(), 3);
   }
 
-  @Test
+  @Test(enabled = false)
   public void testInList() throws SQLException {
     List list = new Sql(conn, true).select("*").from("test1")
       .where(Restrictions.in("num2", Arrays.asList(3, 1)))
@@ -82,7 +90,7 @@ public class SelectTest {
     assertEquals(list.size(), 5);
   }
 
-  @Test
+  @Test(enabled = false)
   public void testBefore() throws SQLException {
     Calendar c = Calendar.getInstance();
     c.set(2015, Calendar.APRIL, 8, 15, 12, 13);
@@ -95,7 +103,7 @@ public class SelectTest {
     assertEquals(list.get(0).get("desc"), "1st date");
   }
 
-  @Test
+  @Test(enabled = false)
   public void testAfter() throws SQLException {
     Calendar c = Calendar.getInstance();
     c.set(2015, Calendar.APRIL, 8, 15, 12, 13);
@@ -107,4 +115,45 @@ public class SelectTest {
     assertEquals(list.size(), 1);
     assertEquals(list.get(0).get("desc"), "2nd date");
   }
+
+	@Test(enabled = true)
+	public void testMapperAll() throws SQLException {
+		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("*").from("test1")
+			.list(new Mapper<Test1Bean>() {
+				@Override
+				protected Test1Bean toObject() throws SQLException {
+					Test1Bean t = new Test1Bean();
+					t.desc = get("desc");
+					t.num1 = getInt("num1");
+					t.now = getTimestamp("now");
+					t.num2 = getDouble("num2");
+					return t;
+				}
+			});
+		assertNotNull(list);
+	}
+
+	@Test(enabled = true)
+	public void testMapperSelected() throws SQLException {
+		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("desc, num2").from("test1")
+			.list(new Mapper<Test1Bean>() {
+				@Override
+				protected Test1Bean toObject() throws SQLException {
+					Test1Bean t = new Test1Bean();
+					t.desc = get("desc");
+					t.num1 = getInt("num1");
+					t.now = getTimestamp("now");
+					t.num2 = getDouble("num2");
+					return t;
+				}
+			});
+		assertNotNull(list);
+	}
+
+	class Test1Bean {
+		String desc;
+		Integer num1;
+		Date now;
+		Double num2;
+	}
 }

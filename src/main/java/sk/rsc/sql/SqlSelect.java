@@ -93,8 +93,8 @@ public final class SqlSelect<T> extends SqlCmd {
       _log();
       if (!isMockMode) {
         pst = toStmt();
-        rs = pst.executeQuery();
-        return rs.next() ? mapper.toObject(rs) : null;
+        mapper.init(rs = pst.executeQuery());
+        return rs.next() ? mapper.toObject() : null;
       } else {
         return null;
       }
@@ -141,13 +141,13 @@ public final class SqlSelect<T> extends SqlCmd {
       _log();
       if (!isMockMode) {
         pst = toStmt();
-        rs = pst.executeQuery();
+				mapper.init(rs = pst.executeQuery());
 
         List<T> list = new ArrayList<T>(limit < Integer.MAX_VALUE ? limit : 1000);
         int i = 0;
         while (rs.next() && i < offset + limit) {
           if (i++ >= offset) {
-            list.add(mapper.toObject(rs));
+            list.add(mapper.toObject());
           }
         }
         return list;
@@ -177,12 +177,12 @@ public final class SqlSelect<T> extends SqlCmd {
       _log();
       if (!isMockMode) {
         pst = toStmt();
-        rs = pst.executeQuery();
+        mapper.init(rs = pst.executeQuery());
 
         int i = 0;
         while (rs.next() && i < offset + limit) {
           if (i++ >= offset) {
-            handler.handle(mapper.toObject(rs));
+            handler.handle(mapper.toObject());
           }
         }
       }
