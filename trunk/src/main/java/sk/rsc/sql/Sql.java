@@ -5,6 +5,7 @@ import sk.rsc.sql.logging.NoLogger;
 import sk.rsc.sql.logging.SoutLogger;
 
 import java.sql.Connection;
+import java.util.List;
 
 /**
  * Main library entry class.
@@ -73,6 +74,10 @@ public final class Sql<T> {
   }
 
   public SqlSelect<T> select(String... columns) {
+    return new SqlSelect<T>(conn, logSql, Sql.isMockMode, columns);
+  }
+
+  public SqlSelect<T> select(List<String> columns) {
     return new SqlSelect<T>(conn, logSql, Sql.isMockMode, columns);
   }
 
