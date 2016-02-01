@@ -3,10 +3,8 @@ package sk.rsc.sql;
 import sk.rsc.sql.restrictions.Restriction;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Sql command SELECT ... FROM table JOIN ... WHERE ....
@@ -26,8 +24,12 @@ public final class SqlSelect<T> extends SqlCmd {
   private final List<Order> order = new ArrayList<Order>();
 
   SqlSelect(Connection conn, boolean logSql, boolean isMockMode, String... columns) {
+    this(conn, logSql, isMockMode, columns != null ? Arrays.asList(columns) : null);
+  }
+
+  SqlSelect(Connection conn, boolean logSql, boolean isMockMode, List<String> columns) {
     super(conn, logSql, isMockMode);
-    this.columns.addAll(Arrays.asList(columns));
+		this.columns.addAll(columns == null || columns.size() == 0 ? Collections.singletonList("*") : columns);
   }
 
   public SqlSelect<T> add(String column) {
@@ -72,12 +74,20 @@ public final class SqlSelect<T> extends SqlCmd {
   }
 
   public SqlSelect<T> where(Restriction... restrictions) {
-    this.where.addAll(Arrays.asList(restrictions));
+    return where(restrictions != null ? Arrays.asList(restrictions) : null);
+  }
+
+  public SqlSelect<T> where(List<Restriction> restrictions) {
+    this.where.addAll(restrictions != null ? restrictions : new ArrayList<Restriction>());
     return this;
   }
 
   public SqlSelect<T> order(Order... orders) {
-    this.order.addAll(Arrays.asList(orders));
+    return order(orders != null ? Arrays.asList(orders) : null);
+  }
+
+  public SqlSelect<T> order(List<Order> orders) {
+    this.order.addAll(orders != null ? orders : new ArrayList<Order>());
     return this;
   }
 
