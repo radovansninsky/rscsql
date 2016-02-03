@@ -12,10 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.testng.Assert.*;
 
@@ -116,37 +113,21 @@ public class SelectTest {
     assertEquals(list.get(0).get("desc"), "2nd date");
   }
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testMapperAll() throws SQLException {
-		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("*").from("test1")
-			.list(new Mapper<Test1Bean>() {
-				@Override
-				protected Test1Bean toObject() throws SQLException {
-					Test1Bean t = new Test1Bean();
-					t.desc = get("desc");
-					t.num1 = getInt("num1");
-					t.now = getTimestamp("now");
-					t.num2 = getDouble("num2");
-					return t;
-				}
-			});
+		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("*").from("test1").list(TEST1BEAN_MAPPER);
+		assertNotNull(list);
+	}
+
+	@Test(enabled = false)
+	public void testMapperSelected() throws SQLException {
+		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("desc, num2").from("test1").list(TEST1BEAN_MAPPER);
 		assertNotNull(list);
 	}
 
 	@Test(enabled = true)
-	public void testMapperSelected() throws SQLException {
-		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("desc, num2").from("test1")
-			.list(new Mapper<Test1Bean>() {
-				@Override
-				protected Test1Bean toObject() throws SQLException {
-					Test1Bean t = new Test1Bean();
-					t.desc = get("desc");
-					t.num1 = getInt("num1");
-					t.now = getTimestamp("now");
-					t.num2 = getDouble("num2");
-					return t;
-				}
-			});
+	public void testSelectedFields() throws SQLException {
+		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select(new ArrayList<String>(0)).from("test1").list(TEST1BEAN_MAPPER);
 		assertNotNull(list);
 	}
 
@@ -156,4 +137,16 @@ public class SelectTest {
 		Date now;
 		Double num2;
 	}
+
+	Mapper<Test1Bean> TEST1BEAN_MAPPER = new Mapper<Test1Bean>() {
+		@Override
+		protected Test1Bean toObject() throws SQLException {
+			Test1Bean t = new Test1Bean();
+			t.desc = get("desc");
+			t.num1 = getInt("num1");
+			t.now = getTimestamp("now");
+			t.num2 = getDouble("num2");
+			return t;
+		}
+	};
 }
