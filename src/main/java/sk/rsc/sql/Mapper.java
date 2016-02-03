@@ -33,36 +33,35 @@ public abstract class Mapper<T> {
 
 	protected String get(String name) throws SQLException {
 		assert name != null : "Field name is null";
-		return fields.contains(name) ? rs.getString(name) : null;
+		return fields.contains(name.toLowerCase()) ? rs.getString(name) : null;
 	}
 
 	protected String getString(String name) throws SQLException {
-		assert name != null : "Field name is null";
 		return get(name);
 	}
 
 	protected Integer getInt(String name) throws SQLException {
 		assert name != null : "Field name is null";
-		return fields.contains(name) ? rs.getObject(name) != null ? rs.getInt(name) : null : null;
+		return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getInt(name) : null : null;
 	}
 
 	protected Long getLong(String name) throws SQLException {
 		assert name != null : "Field name is null";
-		return fields.contains(name) ? rs.getObject(name) != null ? rs.getLong(name) : null : null;
+		return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getLong(name) : null : null;
 	}
 
 	protected Double getDouble(String name) throws SQLException {
 		assert name != null : "Field name is null";
-		return fields.contains(name) ? rs.getObject(name) != null ? rs.getDouble(name) : null : null;
+		return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getDouble(name) : null : null;
 	}
 
 	protected Date getDate(String name) throws SQLException {
 		assert name != null : "Field name is null";
-		return fields.contains(name) ? toDate(rs.getDate(name)) : null;
+		return fields.contains(name.toLowerCase()) ? toDate(rs.getDate(name)) : null;
 	}
 
 	protected Date getTimestamp(String name) throws SQLException {
-		return fields.contains(name) ? toDate(rs.getTimestamp(name)) : null;
+		return fields.contains(name.toLowerCase()) ? toDate(rs.getTimestamp(name)) : null;
 	}
 
 	public Date toDate(java.sql.Date val) {
