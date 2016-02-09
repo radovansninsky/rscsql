@@ -17,11 +17,12 @@ import java.util.List;
 @SuppressWarnings("unused")
 public abstract class Mapper<T> {
 
-	private ResultSet rs;
-	private List<String> fields = new ArrayList<String>();
+	protected ResultSet rs;
+	protected List<String> fields = new ArrayList<String>();
 
 	public void init(ResultSet rs) throws SQLException {
 		this.rs = rs;
+		this.fields.clear();
 
 		ResultSetMetaData mrset = rs.getMetaData();
 		for (int i=1; i<=mrset.getColumnCount(); i++) {
