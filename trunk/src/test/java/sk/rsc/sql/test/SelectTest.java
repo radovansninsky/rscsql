@@ -45,13 +45,13 @@ public class SelectTest {
       stmt.executeUpdate("insert into test1 (num1, num2) values (6, 3)");
       stmt.executeUpdate("insert into test1 (desc, now) values ('1st date', '2015-04-08 11:22:33.888')");
       stmt.executeUpdate("insert into test1 (desc, now) values ('2nd date', '2015-04-08 22:33:44.888')");
-      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc1', 10)");
-      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc2', 20)");
-      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc3', 30)");
-      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc10', 216.46)");
-      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc20', 226.46)");
-      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc30', 236.46)");
-      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc40', 246.46)");
+      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc093456733', 10)");
+      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc093457382', 20)");
+      stmt.executeUpdate("insert into test1 (desc, num1) values ('desc093457638', 30)");
+      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc082748302', 216.46)");
+      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc093444593', 226.46)");
+      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc093446373', 236.46)");
+      stmt.executeUpdate("insert into test1 (desc, num2) values ('desc093456777', 246.46)");
     } finally {
       if (stmt != null) {
         stmt.close();
@@ -68,6 +68,21 @@ public class SelectTest {
   public void testNoFrom() throws SQLException {
     assertEquals(new Sql(conn, true).select("1").firstRow().get("1"), "1");
   }
+
+	@Test
+	public void testStartWith() throws SQLException {
+		List<String> list = new Sql<String>(conn, true)
+			.select("desc").from("test1").where(Restrictions.startWith("desc", "desc09345"))
+			.list(new Mapper<String>() {
+				@Override
+				protected String toObject() throws SQLException {
+					return get("desc");
+				}
+			});
+
+		assertNotNull(list);
+		assertEquals(list.size(), 4);
+	}
 
   @Test(enabled = false)
   public void testInVararray() throws SQLException {
