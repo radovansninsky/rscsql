@@ -19,7 +19,7 @@ public final class SqlSelect<T> extends SqlCmd {
   private String from = null;
   private SqlSelect<T> fromSelect = null;
   private final List<AbstractJoin> joins = new ArrayList<AbstractJoin>();
-  final List<Restriction> where = new ArrayList<Restriction>();
+  private final List<Restriction> where = new ArrayList<Restriction>();
   private final List<String> group = new ArrayList<String>();
   private final List<Order> order = new ArrayList<Order>();
 
@@ -58,8 +58,18 @@ public final class SqlSelect<T> extends SqlCmd {
     return this;
   }
 
+  public SqlSelect<T> join(String schema, String tab, String id1, String id2) {
+    this.joins.add(new Join(schemanizeTable(schema, tab), id1, id2));
+    return this;
+  }
+
   public SqlSelect<T> innerJoin(String tab, String id1, String id2) {
     this.joins.add(new InnerJoin(tab, id1, id2));
+    return this;
+  }
+
+  public SqlSelect<T> innerJoin(String schema, String tab, String id1, String id2) {
+    this.joins.add(new InnerJoin(schemanizeTable(schema, tab), id1, id2));
     return this;
   }
 
@@ -68,8 +78,18 @@ public final class SqlSelect<T> extends SqlCmd {
     return this;
   }
 
+  public SqlSelect<T> leftJoin(String schema, String tab, String id1, String id2) {
+    this.joins.add(new LeftJoin(schemanizeTable(schema, tab), id1, id2));
+    return this;
+  }
+
   public SqlSelect<T> rightJoin(String tab, String id1, String id2) {
     this.joins.add(new RightJoin(tab, id1, id2));
+    return this;
+  }
+
+  public SqlSelect<T> rightJoin(String schema, String tab, String id1, String id2) {
+    this.joins.add(new RightJoin(schemanizeTable(schema, tab), id1, id2));
     return this;
   }
 
@@ -282,41 +302,30 @@ public final class SqlSelect<T> extends SqlCmd {
 
   public PreparedStatement toStmt() throws SQLException {
     PreparedStatement stmt = conn.prepareStatement(toSql());
-    int j = 0;
-    if (fromSelect != null) {
-      for (Restriction r : fromSelect.where) {
-        if (r.hasValues()) {
-          for (Object val : r.getValues()) {
-            if (val instanceof Date) {
-              stmt.setTimestamp(++j, new Timestamp(((Date) val).getTime()));
-            } else {
-              if (val != null) {
-                stmt.setObject(++j, val);
-              } else {
-                stmt.setNull(++j, Types.VARCHAR);
-              }
-            }
-          }
-        }
-      }
-    }
-    for (Restriction r : where) {
-      if (r.hasValues()) {
-        for (Object val : r.getValues()) {
-          if (val instanceof Date) {
-            stmt.setTimestamp(++j, new Timestamp(((Date) val).getTime()));
-          } else {
-            if (val != null) {
-              stmt.setObject(++j, val);
-            } else {
-              stmt.setNull(++j, Types.VARCHAR);
-            }
-          }
-        }
-      }
-    }
+    int j = fromSelect != null ? setUpStmtParams(stmt, fromSelect.where, 0) : 0;
+		setUpStmtParams(stmt, where, j);
     return stmt;
   }
+
+  private int setUpStmtParams(PreparedStatement stmt, List<Restriction> list, int startIdx) throws SQLException {
+		int j = startIdx;
+		for (Restriction r : list) {
+			if (r.hasValues()) {
+				for (Object val : r.getValues()) {
+					if (val instanceof Date) {
+						stmt.setTimestamp(++j, new Timestamp(((Date) val).getTime()));
+					} else {
+						if (val != null) {
+							stmt.setObject(++j, val);
+						} else {
+							stmt.setNull(++j, Types.VARCHAR);
+						}
+					}
+				}
+			}
+		}
+		return j;
+	}
 
   public SqlSelect toCountSelect() throws SQLException {
     SqlSelect s = new SqlSelect(conn, logSql, isMockMode, "count(1) as cnt");
@@ -380,7 +389,7 @@ public final class SqlSelect<T> extends SqlCmd {
       this.id2 = id2;
     }
 
-    abstract String getClause();
+		abstract String getClause();
 
     String toSql() {
       return getClause() + " " + tab + " on " + id1 + " = " + id2;
