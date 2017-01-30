@@ -4,7 +4,7 @@
   <tstamp><format property="build.time" pattern="yyyy-MM-dd_HH-mm-ss"/></tstamp>
   <buildnumber/>
   <property name="build.no" value="${build.number}"/>
-  <property name="version" value="1.11.${build.no}"/>
+  <property name="version" value="1.12.${build.no}"/>
 
   <property name="ivy.version" value="2.4.0"/>
   <property name="ivy.home" value="${user.home}/.ant"/>
