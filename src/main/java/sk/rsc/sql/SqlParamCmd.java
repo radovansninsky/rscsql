@@ -27,7 +27,7 @@ public abstract class SqlParamCmd extends SqlCmd {
     PreparedStatement pst = null;
     try {
       _log(false);
-      if (!isMockMode) {
+      if (!isMockMode  && fields.size() > 0) {
         pst = toStmt();
         pst.executeUpdate();
       }
