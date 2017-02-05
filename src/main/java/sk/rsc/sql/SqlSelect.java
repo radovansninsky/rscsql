@@ -200,6 +200,7 @@ public final class SqlSelect<T> extends SqlCmd {
     iterate(mapper, 0, limit, handler);
   }
 
+  @SuppressWarnings("SameParameterValue")
   public void iterate(Mapper<T> mapper, int offset, int limit, RowHandler<T> handler) throws SQLException {
     PreparedStatement pst = null;
     ResultSet rs = null;
@@ -267,6 +268,7 @@ public final class SqlSelect<T> extends SqlCmd {
     iterate(0, limit, handler);
   }
 
+  @SuppressWarnings("SameParameterValue")
   public void iterate(int offset, int limit, RowHandler<Row> handler) throws SQLException {
     PreparedStatement pst = null;
     ResultSet rs = null;
@@ -327,7 +329,27 @@ public final class SqlSelect<T> extends SqlCmd {
 		return j;
 	}
 
-  public SqlSelect toCountSelect() throws SQLException {
+  /**
+   * Creates new copy of this select with all columns, joins and where restrictions.
+   *
+   * @return new copy of this select
+   */
+  @SuppressWarnings("unchecked")
+  public SqlSelect toCopySelect() {
+    SqlSelect s = new SqlSelect(conn, logSql, isMockMode, columns);
+    s.from = this.from;
+    s.joins.addAll(this.joins);
+    s.where.addAll(this.where);
+    return s;
+  }
+
+  /**
+   * Creates {@code count(1)} version of this select with all joins and where restrictions.
+   *
+   * @return count version of this select
+   */
+  @SuppressWarnings("unchecked")
+  public SqlSelect toCountSelect() {
     SqlSelect s = new SqlSelect(conn, logSql, isMockMode, "count(1) as cnt");
     s.from = this.from;
     s.joins.addAll(this.joins);
@@ -335,6 +357,13 @@ public final class SqlSelect<T> extends SqlCmd {
     return s;
   }
 
+  /**
+   * Creates new count select ({@link #toCountSelect()} and execute it to count rows returned by this select.
+   *
+   * @return count of returned by this select
+   * @throws SQLException if execution of count select fails
+   */
+  @SuppressWarnings("ConstantConditions")
   public long countRows() throws SQLException {
     return isMockMode ? 0L : toCountSelect().firstRow().getLong("cnt");
   }
