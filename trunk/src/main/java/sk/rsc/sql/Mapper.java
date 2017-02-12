@@ -1,20 +1,19 @@
 package sk.rsc.sql;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
- * Maps JDBC {@link ResultSet} to generics object.
+ * Maps JDBC {@link ResultSet} to pojo.
  *
  * @author Radovan Sninsky
  * @since 2012-05-24 16:57
  * @see SqlSelect#list(Mapper) and simimlar for usage
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "SameParameterValue"})
 public abstract class Mapper<T> {
 
 	protected ResultSet rs;
@@ -51,9 +50,19 @@ public abstract class Mapper<T> {
 		return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getLong(name) : null : null;
 	}
 
+	protected Boolean getBoolean(String name) throws SQLException {
+		assert name != null : "Field name is null";
+		return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getBoolean(name) : null : null;
+	}
+
 	protected Double getDouble(String name) throws SQLException {
 		assert name != null : "Field name is null";
 		return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getDouble(name) : null : null;
+	}
+
+	protected BigDecimal getBigDecimal(String name) throws SQLException {
+		assert name != null : "Field name is null";
+		return fields.contains(name.toLowerCase()) && rs.getObject(name) != null ? rs.getBigDecimal(name) : null ;
 	}
 
 	protected Date getDate(String name) throws SQLException {
@@ -62,10 +71,21 @@ public abstract class Mapper<T> {
 	}
 
 	protected Date getTimestamp(String name) throws SQLException {
+    assert name != null : "Field name is null";
 		return fields.contains(name.toLowerCase()) ? toDate(rs.getTimestamp(name)) : null;
 	}
 
-	public Date toDate(java.sql.Date val) {
+  protected <E extends Enum<E>> E getEnum(String name, Class<E> enumType) throws SQLException {
+    assert name != null : "Field name is null";
+
+    Map<String, E> map = new HashMap<String, E>(enumType.getEnumConstants().length);
+    for (E e : enumType.getEnumConstants()) {
+      map.put(e.name(), e);
+    }
+    return fields.contains(name.toLowerCase()) && map.keySet().contains(rs.getString(name)) ? map.get(rs.getString(name)) : null;
+  }
+
+  public Date toDate(java.sql.Date val) {
 		return val != null ? new Date(val.getTime()) : null;
 	}
 
