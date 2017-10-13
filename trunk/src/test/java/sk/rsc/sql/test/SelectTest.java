@@ -61,7 +61,9 @@ public class SelectTest {
 
   @AfterClass
   public void tearDown() {
-    if (conn != null) { try { conn.close(); } catch (Throwable t) { } }
+    if (conn != null) {
+      try { conn.close(); } catch (Exception ignored) { }
+    }
   }
 
   @Test(enabled = false)
@@ -69,20 +71,20 @@ public class SelectTest {
     assertEquals(new Sql(conn, true).select("1").firstRow().get("1"), "1");
   }
 
-	@Test
-	public void testStartWith() throws SQLException {
-		List<String> list = new Sql<String>(conn, true)
-			.select("desc").from("test1").where(Restrictions.startWith("desc", "desc09345"))
-			.list(new Mapper<String>() {
-				@Override
-				protected String toObject() throws SQLException {
-					return get("desc");
-				}
-			});
+  @Test
+  public void testStartWith() throws SQLException {
+    List<String> list = new Sql<String>(conn, true)
+      .select("desc").from("test1").where(Restrictions.startWith("desc", "desc09345"))
+      .list(new Mapper<String>() {
+        @Override
+        protected String toObject() throws SQLException {
+          return get("desc");
+        }
+      });
 
-		assertNotNull(list);
-		assertEquals(list.size(), 4);
-	}
+    assertNotNull(list);
+    assertEquals(list.size(), 4);
+  }
 
   @Test(enabled = false)
   public void testInVararray() throws SQLException {
@@ -128,40 +130,40 @@ public class SelectTest {
     assertEquals(list.get(0).get("desc"), "2nd date");
   }
 
-	@Test(enabled = false)
-	public void testMapperAll() throws SQLException {
-		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("*").from("test1").list(TEST1BEAN_MAPPER);
-		assertNotNull(list);
-	}
+  @Test(enabled = false)
+  public void testMapperAll() throws SQLException {
+    List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("*").from("test1").list(TEST1BEAN_MAPPER);
+    assertNotNull(list);
+  }
 
-	@Test(enabled = false)
-	public void testMapperSelected() throws SQLException {
-		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("desc, num2").from("test1").list(TEST1BEAN_MAPPER);
-		assertNotNull(list);
-	}
+  @Test(enabled = false)
+  public void testMapperSelected() throws SQLException {
+    List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("desc, num2").from("test1").list(TEST1BEAN_MAPPER);
+    assertNotNull(list);
+  }
 
-	@Test(enabled = true)
-	public void testSelectedFields() throws SQLException {
-		List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select(new ArrayList<String>(0)).from("test1").list(TEST1BEAN_MAPPER);
-		assertNotNull(list);
-	}
+  @Test(enabled = true)
+  public void testSelectedFields() throws SQLException {
+    List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select(new ArrayList<String>(0)).from("test1").list(TEST1BEAN_MAPPER);
+    assertNotNull(list);
+  }
 
-	class Test1Bean {
-		String desc;
-		Integer num1;
-		Date now;
-		Double num2;
-	}
+  class Test1Bean {
+    String desc;
+    Integer num1;
+    Date now;
+    Double num2;
+  }
 
-	Mapper<Test1Bean> TEST1BEAN_MAPPER = new Mapper<Test1Bean>() {
-		@Override
-		protected Test1Bean toObject() throws SQLException {
-			Test1Bean t = new Test1Bean();
-			t.desc = get("desc");
-			t.num1 = getInt("num1");
-			t.now = getTimestamp("now");
-			t.num2 = getDouble("num2");
-			return t;
-		}
-	};
+  Mapper<Test1Bean> TEST1BEAN_MAPPER = new Mapper<Test1Bean>() {
+    @Override
+    protected Test1Bean toObject() throws SQLException {
+      Test1Bean t = new Test1Bean();
+      t.desc = get("desc");
+      t.num1 = getInt("num1");
+      t.now = getTimestamp("now");
+      t.num2 = getDouble("num2");
+      return t;
+    }
+  };
 }

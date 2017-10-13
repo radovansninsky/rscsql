@@ -29,11 +29,22 @@ public final class SqlSelect<T> extends SqlCmd {
 
   SqlSelect(Connection conn, boolean logSql, boolean isMockMode, List<String> columns) {
     super(conn, logSql, isMockMode);
-		this.columns.addAll(columns == null || columns.size() == 0 ? Collections.singletonList("*") : columns);
+    columns = columns == null || columns.size() == 0 ? Collections.singletonList("*") : columns;
+    for (String s : columns) {
+      add(s);
+    }
   }
 
   public SqlSelect<T> add(String column) {
-    this.columns.add(column);
+    if (column != null) {
+      for (String s : column.split(",")) {
+        s = s.trim();
+        if (s.contains(".") && !s.contains(" ")) {
+          s += " " + Utils.makeAliasIfDotField(s);
+        }
+        this.columns.add(s);
+      }
+    }
     return this;
   }
 
@@ -171,7 +182,7 @@ public final class SqlSelect<T> extends SqlCmd {
       _log();
       if (!isMockMode) {
         pst = toStmt();
-				mapper.init(rs = pst.executeQuery());
+        mapper.init(rs = pst.executeQuery());
 
         List<T> list = new ArrayList<T>(limit < Integer.MAX_VALUE ? limit : 1000);
         int i = 0;
@@ -305,29 +316,29 @@ public final class SqlSelect<T> extends SqlCmd {
   public PreparedStatement toStmt() throws SQLException {
     PreparedStatement stmt = conn.prepareStatement(toSql());
     int j = fromSelect != null ? setUpStmtParams(stmt, fromSelect.where, 0) : 0;
-		setUpStmtParams(stmt, where, j);
+    setUpStmtParams(stmt, where, j);
     return stmt;
   }
 
   private int setUpStmtParams(PreparedStatement stmt, List<Restriction> list, int startIdx) throws SQLException {
-		int j = startIdx;
-		for (Restriction r : list) {
-			if (r.hasValues()) {
-				for (Object val : r.getValues()) {
-					if (val instanceof Date) {
-						stmt.setTimestamp(++j, new Timestamp(((Date) val).getTime()));
-					} else {
-						if (val != null) {
-							stmt.setObject(++j, val);
-						} else {
-							stmt.setNull(++j, Types.VARCHAR);
-						}
-					}
-				}
-			}
-		}
-		return j;
-	}
+    int j = startIdx;
+    for (Restriction r : list) {
+      if (r.hasValues()) {
+        for (Object val : r.getValues()) {
+          if (val instanceof Date) {
+            stmt.setTimestamp(++j, new Timestamp(((Date) val).getTime()));
+          } else {
+            if (val != null) {
+              stmt.setObject(++j, val);
+            } else {
+              stmt.setNull(++j, Types.VARCHAR);
+            }
+          }
+        }
+      }
+    }
+    return j;
+  }
 
   /**
    * Creates new copy of this select with all columns, joins and where restrictions.
