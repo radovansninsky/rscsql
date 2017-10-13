@@ -4,6 +4,7 @@
     <groups>
       <run>
         <exclude name="oracle"/>
+        <exclude name="psql"/>
       </run>
     </groups>
     <classes>
