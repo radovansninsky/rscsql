@@ -104,6 +104,36 @@ public final class SqlSelect<T> extends SqlCmd {
     return this;
   }
 
+  public SqlSelect<T> leftOuterJoin(String tab, String id1, String id2) {
+    this.joins.add(new LeftOuterJoin(tab, id1, id2));
+    return this;
+  }
+
+  public SqlSelect<T> leftOuterJoin(String schema, String tab, String id1, String id2) {
+    this.joins.add(new LeftOuterJoin(schemanizeTable(schema, tab), id1, id2));
+    return this;
+  }
+
+  public SqlSelect<T> rightOuterJoin(String tab, String id1, String id2) {
+    this.joins.add(new RightOuterJoin(tab, id1, id2));
+    return this;
+  }
+
+  public SqlSelect<T> rightOuterJoin(String schema, String tab, String id1, String id2) {
+    this.joins.add(new RightOuterJoin(schemanizeTable(schema, tab), id1, id2));
+    return this;
+  }
+
+  public SqlSelect<T> fullOuterJoin(String tab, String id1, String id2) {
+    this.joins.add(new FullOuterJoin(tab, id1, id2));
+    return this;
+  }
+
+  public SqlSelect<T> fullOuterJoin(String schema, String tab, String id1, String id2) {
+    this.joins.add(new FullOuterJoin(schemanizeTable(schema, tab), id1, id2));
+    return this;
+  }
+
   public SqlSelect<T> where(Restriction... restrictions) {
     return where(restrictions != null ? Arrays.asList(restrictions) : null);
   }
@@ -252,7 +282,7 @@ public final class SqlSelect<T> extends SqlCmd {
       if (!isMockMode) {
         pst = toStmt();
         rs = pst.executeQuery();
-        List<Row> list = new ArrayList<Row>(limit < Integer.MAX_VALUE ? limit : 1000); // todo tvrdy limit !!!
+        List<Row> list = new ArrayList<Row>(limit < Integer.MAX_VALUE ? limit : 1000); // fixme hard coded limit !!!
         int i = 0;
         while (rs.next() && i < limit) {
           if (i++ >= offset) {
@@ -477,6 +507,39 @@ public final class SqlSelect<T> extends SqlCmd {
     @Override
     String getClause() {
       return "right join";
+    }
+  }
+
+  private class LeftOuterJoin extends AbstractJoin {
+    private LeftOuterJoin(String tab, String id1, String id2) {
+      super(tab, id1, id2);
+    }
+
+    @Override
+    String getClause() {
+      return "left outer join";
+    }
+  }
+
+  private class RightOuterJoin extends AbstractJoin {
+    private RightOuterJoin(String tab, String id1, String id2) {
+      super(tab, id1, id2);
+    }
+
+    @Override
+    String getClause() {
+      return "right outer join";
+    }
+  }
+
+  private class FullOuterJoin extends AbstractJoin {
+    private FullOuterJoin(String tab, String id1, String id2) {
+      super(tab, id1, id2);
+    }
+
+    @Override
+    String getClause() {
+      return "full outer join";
     }
   }
 }
