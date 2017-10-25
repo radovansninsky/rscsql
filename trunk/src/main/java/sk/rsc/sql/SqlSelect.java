@@ -29,15 +29,15 @@ public final class SqlSelect<T> extends SqlCmd {
 
   SqlSelect(Connection conn, boolean logSql, boolean isMockMode, List<String> columns) {
     super(conn, logSql, isMockMode);
-    columns = columns == null || columns.size() == 0 ? Collections.singletonList("*") : columns;
+    columns = columns == null || columns.size() == 0 ? Collections.<String>emptyList() : columns;
     for (String s : columns) {
       add(s);
     }
   }
 
-  public SqlSelect<T> add(String column) {
-    if (column != null) {
-      for (String s : column.split(",")) {
+  public SqlSelect<T> add(String columns) {
+    if (columns != null) {
+      for (String s : splitToColumns(columns)) {
         s = s.trim();
         if (s.contains(".") && !s.contains(" ")) {
           s += " " + Utils.makeAliasIfDotField(s);
@@ -46,6 +46,26 @@ public final class SqlSelect<T> extends SqlCmd {
       }
     }
     return this;
+  }
+
+  private List<String> splitToColumns(String columns) {
+    List<String> list = new ArrayList<String>(100);
+    boolean inParenthesis = false;
+    int s = 0;
+    columns = columns.trim();
+    char[] c = columns.toCharArray();
+    for (int i = 0; i<columns.length(); i++) {
+      if (c[i] == '(') {
+        inParenthesis = true;
+      } else if (c[i] == ')') {
+        inParenthesis = false;
+      } if (c[i] == ',' && !inParenthesis) {
+        list.add(columns.substring(s, i));
+        s = i+1;
+      }
+    }
+    list.add(columns.substring(s));
+    return list;
   }
 
   public SqlSelect<T> from(String from) {
