@@ -144,8 +144,11 @@ public class SelectTest {
 
   @Test(enabled = true)
   public void testSelectedFields() throws SQLException {
-    List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select(new ArrayList<String>(0)).from("test1").list(TEST1BEAN_MAPPER);
-    assertNotNull(list);
+    try {
+      new Sql(conn, true).select(Collections.<String>emptyList()).from("test1").list();
+      fail("SQLException should be raised for wrong select syntax!");
+    } catch (SQLException e) {
+    }
   }
 
   class Test1Bean {
