@@ -57,7 +57,7 @@ public class CallTest {
     new Sql(conn, true).call("proc_1").execute();
     new Sql(conn, true).call("proc_2", "nieco", 18).execute();
 
-    SqlCallable call = new Sql(conn, true).call("proc_3", Types.VARCHAR, "nieco2");
+    SqlCallable call = new Sql(conn, true).call("proc_3", Types.VARCHAR).in("nieco2");
     call.execute();
     System.out.println("out = " + call.getReturn());
   }

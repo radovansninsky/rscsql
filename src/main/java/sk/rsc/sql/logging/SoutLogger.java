@@ -2,9 +2,9 @@ package sk.rsc.sql.logging;
 
 /**
  * SoutLogger logs messages into standard console output.
- * <br/>
+ * <br>
  * There is no difference between levels. Log message looks:
- * <br/>
+ * <br>
  * <pre>
  *   Executing SQL:
  *   &lt;orginal message&gt;

@@ -13,7 +13,7 @@ import java.util.List;
  * @author Radovan Sninsky
  * @since 2012-05-16 22:09
  */
-@SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "WeakerAccess"})
 public final class Sql<T> {
 
   private static Logger logger = new NoLogger();
@@ -46,7 +46,7 @@ public final class Sql<T> {
 
   /**
    * Sets custom {@link Logger} as logger for library.
-   * <br/>
+   * <br>
    * <pre>
    *   Sql.setCustomLogger(new Logger() {
    *     void log(boolean important, String message) {
@@ -115,9 +115,5 @@ public final class Sql<T> {
 
   public SqlCallable call(String callable, Object... params) {
     return new SqlCallable(conn, logSql, Sql.isMockMode, callable).addParams(params);
-  }
-
-  public SqlCallable call(String callable, int retType, Object... params) {
-    return new SqlCallable(conn, logSql, Sql.isMockMode, callable, retType).addParams(params);
   }
 }

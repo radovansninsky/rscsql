@@ -1,0 +1,39 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.7
+
+group "sk.rsc"
+version "1.15.$rev"
+buildTime = new Date().format('yyyy-MM-dd_HH-mm-ss')
+
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testCompile group: 'com.h2database', name: 'h2', version: '1.4.184'
+  testCompile group: 'org.testng', name: 'testng', version: '6.9.10'
+}
+
+jar {
+  manifest {
+    attributes(
+      'Implementation-Title': 'RSC Sql library',
+      'Implementation-Version': version,
+      'Implementation-Vendor': 'Radovan Sninsky',
+      'Build-No': buildNo,
+      'Build-Time': buildTime
+    )
+  }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}

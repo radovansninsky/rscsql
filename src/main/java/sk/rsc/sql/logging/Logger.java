@@ -2,7 +2,7 @@ package sk.rsc.sql.logging;
 
 /**
  * Logger interface used by library clasess for emitting log messages.
- * <br/>
+ * <br>
  * There are two level of messages, standard level and important level.
  * Handling of levels is based on logging implementation.
  * See logging initialization {@link sk.rsc.sql.Sql#setCustomLogger}.
