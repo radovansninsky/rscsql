@@ -12,16 +12,16 @@ import java.util.Date;
  * @author Radovan Sninsky
  * @since 2012-05-16 22:58
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess", "UnusedReturnValue"})
 public final class SqlSelect<T> extends SqlCmd {
 
-  private final List<String> columns = new ArrayList<String>();
+  private final List<String> columns = new ArrayList<>();
   private String from = null;
   private SqlSelect<T> fromSelect = null;
-  private final List<AbstractJoin> joins = new ArrayList<AbstractJoin>();
-  private final List<Restriction> where = new ArrayList<Restriction>();
-  private final List<String> group = new ArrayList<String>();
-  private final List<Order> order = new ArrayList<Order>();
+  private final List<AbstractJoin> joins = new ArrayList<>();
+  private final List<Restriction> where = new ArrayList<>();
+  private final List<String> group = new ArrayList<>();
+  private final List<Order> order = new ArrayList<>();
 
   SqlSelect(Connection conn, boolean logSql, boolean isMockMode, String... columns) {
     this(conn, logSql, isMockMode, columns != null ? Arrays.asList(columns) : null);
@@ -39,7 +39,7 @@ public final class SqlSelect<T> extends SqlCmd {
     if (columns != null) {
       for (String s : splitToColumns(columns)) {
         s = s.trim();
-        if (s.contains(".") && !s.contains(" ")) {
+        if (s.contains(".") && !(s.contains(" ") || s.contains("*"))) {
           s += " " + Utils.makeAliasIfDotField(s);
         }
         this.columns.add(s);
@@ -49,7 +49,7 @@ public final class SqlSelect<T> extends SqlCmd {
   }
 
   private List<String> splitToColumns(String columns) {
-    List<String> list = new ArrayList<String>(100);
+    List<String> list = new ArrayList<>(100);
     boolean inParenthesis = false;
     int s = 0;
     columns = columns.trim();
@@ -163,6 +163,10 @@ public final class SqlSelect<T> extends SqlCmd {
     return this;
   }
 
+  public List<Restriction> listRestrictions() {
+    return new ArrayList<>(where);
+  }
+
   public SqlSelect<T> order(Order... orders) {
     return order(orders != null ? Arrays.asList(orders) : null);
   }
@@ -234,7 +238,7 @@ public final class SqlSelect<T> extends SqlCmd {
         pst = toStmt();
         mapper.init(rs = pst.executeQuery());
 
-        List<T> list = new ArrayList<T>(limit < Integer.MAX_VALUE ? limit : 1000);
+        List<T> list = new ArrayList<>(limit < Integer.MAX_VALUE ? limit : 1000);
         int i = 0;
         while (rs.next() && i < offset + limit) {
           if (i++ >= offset) {
@@ -243,7 +247,7 @@ public final class SqlSelect<T> extends SqlCmd {
         }
         return list;
       } else {
-        return new ArrayList<T>();
+        return new ArrayList<>();
       }
     } catch (RuntimeException e) {
       throw new SQLException("Mapping failed", e);
@@ -302,7 +306,7 @@ public final class SqlSelect<T> extends SqlCmd {
       if (!isMockMode) {
         pst = toStmt();
         rs = pst.executeQuery();
-        List<Row> list = new ArrayList<Row>(limit < Integer.MAX_VALUE ? limit : 1000); // fixme hard coded limit !!!
+        List<Row> list = new ArrayList<>(limit < Integer.MAX_VALUE ? limit : 1000); // fixme hard coded limit !!!
         int i = 0;
         while (rs.next() && i < limit) {
           if (i++ >= offset) {
@@ -311,7 +315,7 @@ public final class SqlSelect<T> extends SqlCmd {
         }
         return list;
       } else {
-        return new ArrayList<Row>();
+        return new ArrayList<>();
       }
     } catch (RuntimeException e) {
       throw new SQLException("Mapping failed", e);
@@ -365,29 +369,42 @@ public final class SqlSelect<T> extends SqlCmd {
 
   public PreparedStatement toStmt() throws SQLException {
     PreparedStatement stmt = conn.prepareStatement(toSql());
-    int j = fromSelect != null ? setUpStmtParams(stmt, fromSelect.where, 0) : 0;
-    setUpStmtParams(stmt, where, j);
+    int j = fromSelect != null ? setupStmtParams(stmt, fromSelect.where, 0) : 0;
+    setupStmtParams(stmt, where, j);
     return stmt;
   }
 
-  private int setUpStmtParams(PreparedStatement stmt, List<Restriction> list, int startIdx) throws SQLException {
+  private int setupStmtParams(PreparedStatement stmt, List<Restriction> list, int startIdx) throws SQLException {
     int j = startIdx;
     for (Restriction r : list) {
       if (r.hasValues()) {
         for (Object val : r.getValues()) {
-          if (val instanceof Date) {
-            stmt.setTimestamp(++j, new Timestamp(((Date) val).getTime()));
-          } else {
-            if (val != null) {
-              stmt.setObject(++j, val);
-            } else {
-              stmt.setNull(++j, Types.VARCHAR);
-            }
-          }
+          j = setupStmtParam(stmt, j, val);
         }
       }
     }
     return j;
+  }
+
+  private int setupStmtParam(PreparedStatement stmt, int idx, Object val) throws SQLException {
+    int i = idx;
+    if (val instanceof Date) {
+      stmt.setTimestamp(++i, new Timestamp(((Date) val).getTime()));
+    } else if (val instanceof Restriction) {
+      Restriction r = (Restriction) val;
+      if (r.hasValues()) {
+        for (Object v : r.getValues()) {
+          i = setupStmtParam(stmt, i, v);
+        }
+      }
+    } else {
+      if (val != null) {
+        stmt.setObject(++i, val);
+      } else {
+        stmt.setNull(++i, Types.VARCHAR);
+      }
+    }
+    return i;
   }
 
   /**

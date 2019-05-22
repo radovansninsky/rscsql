@@ -138,23 +138,33 @@ public final class Restrictions {
   }
 
   /**
-   * Is in clause.
+   * Is in array of values clause.
    * @param field   field
    * @param values  list of any values
    * @return initialized InRestriction
    */
   public static Restriction in(String field, List values) {
-    return new InRestriction(field, values);
+    return new InValuesRestriction(field, values);
   }
 
   /**
-   * Is in clause.
+   * Is in array of values clause.
    * @param field   field
    * @param values  varargs of any values
    * @return initialized InRestriction
    */
   public static Restriction in(String field, Object... values) {
-    return new InRestriction(field, Arrays.asList(values));
+    return new InValuesRestriction(field, Arrays.asList(values));
+  }
+
+  /**
+   * Is in select clause.
+   * @param field   field
+   * @param select  sql select
+   * @return initialized InRestriction
+   */
+  public static Restriction in(String field, SqlSelect select) {
+    return new InSelectRestriction(field, select);
   }
 
   /**

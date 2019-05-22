@@ -27,6 +27,9 @@ public class SelectTest {
   private static final String CREATE_TABLE =
     "create table test1 (desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2))";
 
+  private static final String CREATE_TABLE_TEST2 =
+    "create table test2 (num1 integer, num2 integer)";
+
   private Connection conn;
 
   @BeforeClass
@@ -52,6 +55,18 @@ public class SelectTest {
       stmt.executeUpdate("insert into test1 (desc, num2) values ('desc093444593', 226.46)");
       stmt.executeUpdate("insert into test1 (desc, num2) values ('desc093446373', 236.46)");
       stmt.executeUpdate("insert into test1 (desc, num2) values ('desc093456777', 246.46)");
+
+      stmt.executeUpdate(CREATE_TABLE_TEST2);
+      stmt.executeUpdate("insert into test2 (num1, num2) values (8, 100)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (6, 101)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (8, 102)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (8, 103)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (4, 104)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (4, 105)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (8, 106)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (5, 107)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (8, 108)");
+      stmt.executeUpdate("insert into test2 (num1, num2) values (8, 109)");
     } finally {
       if (stmt != null) {
         stmt.close();
@@ -149,6 +164,16 @@ public class SelectTest {
       fail("SQLException should be raised for wrong select syntax!");
     } catch (SQLException e) {
     }
+  }
+
+  @Test
+  public void testInSelect() throws SQLException {
+    List<Row> list = new Sql(conn, true).select("*").from("test2")
+      .where(Restrictions.gt("num2", 100))
+      .where(Restrictions.in("num1", new Sql(conn).select("num1").from("test1").where(Restrictions.eq("num2", 3))))
+      .list();
+
+    System.out.println("list.size() = " + list.size());
   }
 
   class Test1Bean {

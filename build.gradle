@@ -1,9 +1,10 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 
 sourceCompatibility = 1.7
 
 group "sk.rsc"
-version "1.15.$rev"
+version "2.0-SNAPSHOT"
 buildTime = new Date().format('yyyy-MM-dd_HH-mm-ss')
 
 
@@ -11,9 +12,30 @@ repositories {
   mavenCentral()
 }
 
+configurations {
+  deployerJars
+}
+
 dependencies {
-  testCompile group: 'com.h2database', name: 'h2', version: '1.4.184'
   testCompile group: 'org.testng', name: 'testng', version: '6.9.10'
+  testCompile group: 'com.h2database', name: 'h2', version: '1.4.184'
+  testCompile group: 'org.postgresql', name: 'postgresql', version: '42.1.4.jre7'
+
+  deployerJars 'io.packagecloud.maven.wagon:maven-packagecloud-wagon:0.0.6'
+}
+
+task createPom {
+  pom {
+    project {
+      groupId "$project.group"
+      artifactId "$project.name"
+      version "$version"
+
+      description "Lightweight DSL-like Java library for accessing data in SQL databases build on top of standard JDBC api."
+      url "https://github.com/radovansninsky/rscsql"
+      inceptionYear "2012"
+    }
+  }.writeTo("$projectDir/build/pom/pom.xml")
 }
 
 jar {
@@ -26,6 +48,14 @@ jar {
       'Build-Time': buildTime
     )
   }
+  into("META-INF/maven/$project.group/$project.name") {
+    from "$projectDir/build/pom/pom.xml"
+  }
+}
+
+javadoc {
+  source = sourceSets.main.allJava
+  options.overview = "src/main/java/overview.html"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -36,4 +66,18 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task javadocJar(type: Jar, dependsOn: javadoc) {
   classifier = 'javadoc'
   from javadoc.destinationDir
+}
+
+artifacts {
+  archives sourcesJar
+  archives javadocJar
+}
+
+uploadArchives {
+  repositories.mavenDeployer {
+    configuration = configurations.deployerJars
+    repository(url: "packagecloud+https://packagecloud.io/radovansninsky/public") {
+      authentication(password: mavenPassword)
+    }
+  }
 }

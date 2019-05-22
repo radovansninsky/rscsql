@@ -14,51 +14,53 @@ import java.util.Date;
  */
 public class Field {
 
-	protected String field;
-	protected Object value;
+  protected String field;
+  protected Object value;
 
-	public Field(String field) {
+  public Field(String field) {
     this(field, null);
-	}
+  }
 
-	public Field(String field, Object value) {
-		this.field = field;
-		this.value = value;
-	}
+  public Field(String field, Object value) {
+    this.field = field;
+    this.value = value;
+  }
 
-	public String getField() {
-		return field;
-	}
+  public String getField() {
+    return field;
+  }
 
-	public Object getValue() {
-		return value;
-	}
+  public Object getValue() {
+    return value;
+  }
 
   public void setValue(Object value) {
     this.value = value;
   }
 
   public void setStmtValue(PreparedStatement stmt, int i) throws SQLException {
-		if (value instanceof Date) {
-			setTimestamp(stmt, i, (Date) value);
-		} else {
-			if (value != null) {
-				stmt.setObject(i, value);
-			} else {
-				stmt.setNull(i, Types.VARCHAR);
-			}
-		}
-	}
+    // todo zavedenie type pre field?
+    if (value instanceof Date) {
+      setTimestamp(stmt, i, (Date) value);
+    } else {
+      if (value != null) {
+        stmt.setObject(i, value);
+      } else {
+//        stmt.setNull(i, Types.VARCHAR);
+        stmt.setObject(i, null);
+      }
+    }
+  }
 
-	protected void setTimestamp(PreparedStatement stmt, int i, Date d) throws SQLException {
-		if (d != null) {
-			stmt.setTimestamp(i, new Timestamp(d.getTime()));
-		} else {
-			stmt.setNull(i, Types.TIMESTAMP);
-		}
-	}
+  protected void setTimestamp(PreparedStatement stmt, int i, Date d) throws SQLException {
+    if (d != null) {
+      stmt.setTimestamp(i, new Timestamp(d.getTime()));
+    } else {
+      stmt.setNull(i, Types.TIMESTAMP);
+    }
+  }
 
-	public String toValueSql() {
-		return "?";
-	}
+  public String toValueSql() {
+    return "?";
+  }
 }

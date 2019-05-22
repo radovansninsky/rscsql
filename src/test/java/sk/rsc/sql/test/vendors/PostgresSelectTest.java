@@ -4,6 +4,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import sk.rsc.sql.Mapper;
+import sk.rsc.sql.Restrictions;
 import sk.rsc.sql.Sql;
 import sk.rsc.sql.SqlSelect;
 
@@ -85,4 +86,12 @@ public class PostgresSelectTest {
       return i;
     }
   };
+
+  @Test(groups = {"psql"})
+  void testSettingBooleanValue() throws SQLException {
+    new Sql(conn).update("customer")
+      .set("swp", false)
+      .where(Restrictions.eq("id", 277))
+      .execute();
+  }
 }
