@@ -1,7 +1,9 @@
-apply plugin: 'java'
-apply plugin: 'maven'
+plugins {
+  id 'java'
+  id 'maven-publish'
+}
 
-sourceCompatibility = 1.7
+sourceCompatibility = 8
 
 group "sk.rsc"
 version "2.0-SNAPSHOT"
@@ -12,30 +14,18 @@ repositories {
   mavenCentral()
 }
 
-configurations {
-  deployerJars
-}
-
 dependencies {
-  testCompile group: 'org.testng', name: 'testng', version: '6.9.10'
-  testCompile group: 'com.h2database', name: 'h2', version: '1.4.184'
-  testCompile group: 'org.postgresql', name: 'postgresql', version: '42.1.4.jre7'
-
-  deployerJars 'io.packagecloud.maven.wagon:maven-packagecloud-wagon:0.0.6'
+  testImplementation group: 'org.testng', name: 'testng', version: '6.9.10'
+  testImplementation group: 'com.h2database', name: 'h2', version: '1.4.184'
+  testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.1.4.jre7'
 }
 
-task createPom {
-  pom {
-    project {
-      groupId "$project.group"
-      artifactId "$project.name"
-      version "$version"
-
-      description "Lightweight DSL-like Java library for accessing data in SQL databases build on top of standard JDBC api."
-      url "https://github.com/radovansninsky/rscsql"
-      inceptionYear "2012"
-    }
-  }.writeTo("$projectDir/build/pom/pom.xml")
+java {
+  withSourcesJar()
+  withJavadocJar()
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(8)
+  }
 }
 
 jar {
@@ -48,9 +38,6 @@ jar {
       'Build-Time': buildTime
     )
   }
-  into("META-INF/maven/$project.group/$project.name") {
-    from "$projectDir/build/pom/pom.xml"
-  }
 }
 
 javadoc {
@@ -58,26 +45,22 @@ javadoc {
   options.overview = "src/main/java/overview.html"
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-  classifier = 'sources'
-  from sourceSets.main.allSource
-}
+publishing {
+  publications {
+    gpr(MavenPublication) {
+      from components.java
+    }
+  }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-}
-
-artifacts {
-  archives sourcesJar
-  archives javadocJar
-}
-
-uploadArchives {
-  repositories.mavenDeployer {
-    configuration = configurations.deployerJars
-    repository(url: "packagecloud+https://packagecloud.io/radovansninsky/public") {
-      authentication(password: mavenPassword)
+  // telling gradle to publish artifact to repo
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/radovansninsky/rscsql")
+      credentials {
+        username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+        password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+      }
     }
   }
 }
