@@ -188,7 +188,7 @@ public final class SqlSelect<T> extends SqlCmd {
       _log();
       if (!isMockMode) {
         pst = toStmt();
-        mapper.init(rs = pst.executeQuery());
+        mapper.init(from, rs = pst.executeQuery());
         return rs.next() ? mapper.toObject() : null;
       } else {
         return null;
@@ -236,7 +236,7 @@ public final class SqlSelect<T> extends SqlCmd {
       _log();
       if (!isMockMode) {
         pst = toStmt();
-        mapper.init(rs = pst.executeQuery());
+        mapper.init(from, rs = pst.executeQuery());
 
         List<T> list = new ArrayList<>(limit < Integer.MAX_VALUE ? limit : 1000);
         int i = 0;
@@ -273,7 +273,7 @@ public final class SqlSelect<T> extends SqlCmd {
       _log();
       if (!isMockMode) {
         pst = toStmt();
-        mapper.init(rs = pst.executeQuery());
+        mapper.init(from, rs = pst.executeQuery());
 
         int i = 0;
         while (rs.next() && i < offset + limit) {
@@ -359,7 +359,7 @@ public final class SqlSelect<T> extends SqlCmd {
   }
 
   private Row toRow(ResultSet rs) throws SQLException {
-    Row row = new Row();
+    Row row = new Row(from);
     ResultSetMetaData rsmd = rs.getMetaData();
     for (int i = 1; i <= rsmd.getColumnCount(); i++) {
       row.set(rsmd.getColumnLabel(i).toLowerCase(), rs.getObject(i));

@@ -2,6 +2,8 @@ package sk.rsc.sql;
 
 import java.util.*;
 
+import static sk.rsc.sql.Utils.makeAliasIfDotField;
+
 /**
  * Row returned by {@link SqlSelect} when no generic class is provided.
  *
@@ -10,23 +12,27 @@ import java.util.*;
  */
 public final class Row {
 
-  public static final Row EMPTY = new Row();
+  public static final Row EMPTY = new Row("");
 
+  private final String tableName;
   private Map<String, Object> nameMap = new HashMap<String, Object>();
 
-  public Row() {
+  Row(String tableName) {
+    this.tableName = tableName;
   }
 
-  public void set(String column, Object value) {
+  void set(String column, Object value) {
     nameMap.put(column, value);
   }
 
   public Object getObject(String column) {
-    return nameMap.get(column);
+    String n1 = makeAliasIfDotField(column);
+    String n2 = makeAliasIfDotField(tableName + "." + column);
+    return nameMap.get(nameMap.containsKey(n1) ? n1 : n2);
   }
 
   public boolean isNull(String column) {
-    return nameMap.get(column) == null;
+    return getObject(column) == null;
   }
 
   public String get(String column) {
@@ -34,12 +40,12 @@ public final class Row {
   }
 
   public String getString(String column) {
-    Object value = nameMap.get(column);
+    Object value = getObject(column);
     return value == null ? null : value.toString();
   }
 
   public Integer getInt(String column) {
-    Object value = nameMap.get(column);
+    Object value = getObject(column);
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -52,7 +58,7 @@ public final class Row {
   }
 
   public Long getLong(String column) {
-    Object value = nameMap.get(column);
+    Object value = getObject(column);
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -65,7 +71,7 @@ public final class Row {
   }
 
   public Date getDate(String column) {
-    Object value = nameMap.get(column);
+    Object value = getObject(column);
     if (value == null) {
       return null;
     } else if (value instanceof java.sql.Date) {
@@ -77,7 +83,7 @@ public final class Row {
     }
   }
 
-	public List<String> listColumns() {
-		return new ArrayList<String>(nameMap.keySet());
-	}
+  public List<String> listColumns() {
+    return new ArrayList<>(nameMap.keySet());
+  }
 }

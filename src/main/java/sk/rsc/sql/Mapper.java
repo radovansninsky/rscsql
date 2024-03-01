@@ -18,16 +18,18 @@ import static sk.rsc.sql.Utils.makeAliasIfDotField;
 @SuppressWarnings({"unused", "SameParameterValue"})
 public abstract class Mapper<T> {
 
+  protected String tableName;
   protected ResultSet rs;
-  protected List<String> fields = new ArrayList<String>();
+  protected List<String> fields = new ArrayList<>();
 
-  public void init(ResultSet rs) throws SQLException {
+  public void init(String tableName, ResultSet rs) throws SQLException {
+    this.tableName = tableName;
     this.rs = rs;
     this.fields.clear();
 
-    ResultSetMetaData mrset = rs.getMetaData();
-    for (int i = 1; i <= mrset.getColumnCount(); i++) {
-      fields.add(mrset.getColumnLabel(i).toLowerCase());
+    ResultSetMetaData mrs = rs.getMetaData();
+    for (int i = 1; i <= mrs.getColumnCount(); i++) {
+      fields.add(mrs.getColumnLabel(i).toLowerCase());
     }
   }
 
@@ -35,8 +37,10 @@ public abstract class Mapper<T> {
 
   protected String get(String name) throws SQLException {
     assert name != null : "Field name is null";
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) ? rs.getString(name) : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? rs.getString(n1) :
+      fields.contains(n2.toLowerCase()) ? rs.getString(n2) : null;
   }
 
   protected String getString(String name) throws SQLException {
@@ -45,55 +49,71 @@ public abstract class Mapper<T> {
 
   protected Integer getInt(String name) throws SQLException {
     assert name != null : "Field name is null";
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getInt(name) : null : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? rs.getObject(n1) != null ? rs.getInt(n1) : null :
+      fields.contains(n2.toLowerCase()) && rs.getObject(n2) != null ? rs.getInt(n2) : null;
   }
 
   protected Long getLong(String name) throws SQLException {
     assert name != null : "Field name is null";
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getLong(name) : null : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? rs.getObject(n1) != null ? rs.getLong(n1) : null :
+      fields.contains(n2.toLowerCase()) && rs.getObject(n2) != null ? rs.getLong(n2) : null;
   }
 
   protected Boolean getBoolean(String name) throws SQLException {
     assert name != null : "Field name is null";
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getBoolean(name) : null : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? rs.getObject(n1) != null ? rs.getBoolean(n1) : null :
+      fields.contains(n2.toLowerCase()) && rs.getObject(n2) != null ? rs.getBoolean(n2) : null;
   }
 
   protected Double getDouble(String name) throws SQLException {
     assert name != null : "Field name is null";
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) ? rs.getObject(name) != null ? rs.getDouble(name) : null : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? rs.getObject(n1) != null ? rs.getDouble(n1) : null :
+      fields.contains(n2.toLowerCase()) && rs.getObject(n2) != null ? rs.getDouble(n2) : null;
   }
 
   protected BigDecimal getBigDecimal(String name) throws SQLException {
     assert name != null : "Field name is null";
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) && rs.getObject(name) != null ? rs.getBigDecimal(name) : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? rs.getObject(n1) != null ? rs.getBigDecimal(n1) : null :
+      fields.contains(n2.toLowerCase()) && rs.getObject(n2) != null ? rs.getBigDecimal(n2) : null;
   }
 
   protected Date getDate(String name) throws SQLException {
     assert name != null : "Field name is null";
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) ? toDate(rs.getDate(name)) : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? toDate(rs.getDate(n1)) :
+      fields.contains(n2.toLowerCase()) ? toDate(rs.getDate(n2)) : null;
   }
 
   protected Date getTimestamp(String name) throws SQLException {
     assert name != null : "Field name is null";
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) ? toDate(rs.getTimestamp(name)) : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? toDate(rs.getTimestamp(n1)) :
+      fields.contains(n2.toLowerCase()) ? toDate(rs.getTimestamp(n2)) : null;
   }
 
   protected <E extends Enum<E>> E getEnum(String name, Class<E> enumType) throws SQLException {
     assert name != null : "Field name is null";
 
-    Map<String, E> map = new HashMap<String, E>(enumType.getEnumConstants().length);
+    Map<String, E> map = new HashMap<>(enumType.getEnumConstants().length);
     for (E e : enumType.getEnumConstants()) {
       map.put(e.name(), e);
     }
-    name = makeAliasIfDotField(name);
-    return fields.contains(name.toLowerCase()) && map.keySet().contains(rs.getString(name)) ? map.get(rs.getString(name)) : null;
+    String n1 = makeAliasIfDotField(name);
+    String n2 = makeAliasIfDotField(tableName + "." + name);
+    return fields.contains(n1.toLowerCase()) ? map.get(rs.getString(n1)) :
+      fields.contains(n2.toLowerCase()) ? map.get(rs.getString(n2)) : null;
   }
 
   public Date toDate(java.sql.Date val) {

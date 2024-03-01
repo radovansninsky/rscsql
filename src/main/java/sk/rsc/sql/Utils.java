@@ -10,8 +10,9 @@ final class Utils {
 
   public static String makeAliasIfDotField(String column) {
     if (column.contains(".")) {
-      int i = column.indexOf(".");
-      return column.substring(0, i) + "$_$" + column.substring(i+1);
+//      int i = column.indexOf(".");
+//      return column.substring(0, i) + "$_$" + column.substring(i+1);
+      return column.replace(".", "$_$");
     }
     return column;
   }

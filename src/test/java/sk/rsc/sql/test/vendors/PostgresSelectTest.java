@@ -3,14 +3,12 @@ package sk.rsc.sql.test.vendors;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import sk.rsc.sql.Mapper;
-import sk.rsc.sql.Restrictions;
-import sk.rsc.sql.Sql;
-import sk.rsc.sql.SqlSelect;
+import sk.rsc.sql.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.testng.Assert.*;
@@ -31,13 +29,13 @@ public class PostgresSelectTest {
   }
 
   @AfterClass(enabled = true, groups = {"psql"})
-  public void tearDownOracle() {
+  public void tearDownPsql() {
     if (conn != null) { try { conn.close(); } catch (Exception ignored) { } }
   }
 
 
   @Test(enabled = true, groups = {"psql"})
-  public void testJoinedField() throws SQLException {
+  public void testJoinedFieldWithStar() throws SQLException {
     SqlSelect<Item> select = new Sql<Item>(conn)
       .select("*", "at.id, at.first_name, at.surname, at.birth, at.death")
       .from("item")
@@ -46,6 +44,56 @@ public class PostgresSelectTest {
     List<Item> list = select.list(ITEM_LIST, 0, 2);
     assertNotNull(list);
     assertEquals(list.size(), 2);
+    assertNotNull(list.get(0));
+    assertNotNull(list.get(0).author);
+    assertEquals(list.get(0).authorId, list.get(0).author.id);
+  }
+
+  @Test(enabled = true, groups = {"psql"})
+  public void testJoinedFieldWithTablePrefixByMapper() throws SQLException {
+    SqlSelect<Item> select = new Sql<Item>(conn)
+      .select("item.id", "inc_id", "item.name", "author_id", "at.id, at.first_name, at.surname, at.birth, at.death")
+      .from("item")
+      .leftJoin("author at", "author_id", "at.id");
+
+    List<Item> list = select.list(ITEM_LIST, 0, 4);
+    assertNotNull(list);
+    assertEquals(list.size(), 4);
+    assertNotNull(list.get(0));
+    assertNotNull(list.get(0).author);
+    assertEquals(list.get(0).authorId, list.get(0).author.id);
+  }
+
+  @Test(enabled = true, groups = {"psql"})
+  public void testJoinedFieldWithTablePrefixByRow() throws SQLException {
+    SqlSelect<Item> select = new Sql<Item>(conn)
+      .select("item.id", "inc_id", "item.name", "author_id", "at.id, at.first_name, at.surname, at.birth, at.death")
+      .from("item")
+      .leftJoin("author at", "author_id", "at.id");
+
+    final List<Item> list = new ArrayList<>();
+    select.iterate(4, new RowHandler<Row>() {
+      @Override
+      protected void handle(Row r) {
+        Author a = new Author();
+        a.id = r.getLong("at.id");
+        a.firstname = r.get("at.first_name");
+        a.lastname = r.get("at.surname");
+        a.birth = r.get("at.birth");
+        a.death = r.get("at.death");
+
+        Item i = new Item();
+        i.id = r.getLong("id");
+        i.incId = r.getLong("inc_id");
+        i.name = r.get("name");
+        i.authorId = r.getLong("author_id");
+        i.author = a;
+
+        list.add(i);
+      }
+    });
+    assertNotNull(list);
+    assertEquals(list.size(), 4);
     assertNotNull(list.get(0));
     assertNotNull(list.get(0).author);
     assertEquals(list.get(0).authorId, list.get(0).author.id);
@@ -90,7 +138,8 @@ public class PostgresSelectTest {
   @Test(groups = {"psql"})
   void testSettingBooleanValue() throws SQLException {
     new Sql(conn).update("customer")
-      .set("swp", false)
+      .set("swp", false
+      )
       .where(Restrictions.eq("id", 277))
       .execute();
   }
