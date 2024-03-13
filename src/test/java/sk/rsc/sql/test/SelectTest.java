@@ -81,9 +81,10 @@ public class SelectTest {
     }
   }
 
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
   @Test(enabled = false)
   public void testNoFrom() throws SQLException {
-    assertEquals(new Sql(conn, true).select("1").firstRow().get("1"), "1");
+    assertEquals(new Sql<Row>(conn, true).select("1").firstRow().get().get("1"), "1");
   }
 
   @Test

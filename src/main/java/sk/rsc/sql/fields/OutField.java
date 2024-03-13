@@ -5,6 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 
+import static sk.rsc.sql.Utils.toInt;
+import static sk.rsc.sql.Utils.toLong;
+
 /**
  * Out field.
  *
@@ -42,27 +45,11 @@ public class OutField extends Field {
   }
 
   public Integer asInt() {
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      return ((Number)value).intValue();
-    } else if (value instanceof String) {
-      return Integer.valueOf((String)value);
-    } else {
-      throw new NumberFormatException("Can't convert to integer");
-    }
+    return toInt(value);
   }
 
   public Long asLong() {
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      return ((Number)value).longValue();
-    } else if (value instanceof String) {
-      return Long.valueOf((String)value);
-    } else {
-      throw new NumberFormatException("Can't convert to long");
-    }
+    return toLong(value);
   }
 
   public Date asDate() {

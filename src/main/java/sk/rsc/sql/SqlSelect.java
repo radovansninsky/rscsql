@@ -1,5 +1,6 @@
 package sk.rsc.sql;
 
+import sk.rsc.sql.joins.*;
 import sk.rsc.sql.restrictions.Restriction;
 
 import java.sql.*;
@@ -181,7 +182,7 @@ public final class SqlSelect<T> extends SqlCmd {
     return this;
   }
 
-  public T firstRow(Mapper<T> mapper) throws SQLException {
+  public Optional<T> firstRow(Mapper<T> mapper) throws SQLException {
     PreparedStatement pst = null;
     ResultSet rs = null;
     try {
@@ -189,9 +190,9 @@ public final class SqlSelect<T> extends SqlCmd {
       if (!isMockMode) {
         pst = toStmt();
         mapper.init(from, rs = pst.executeQuery());
-        return rs.next() ? mapper.toObject() : null;
+        return rs.next() ? Optional.of(mapper.toObject()) : Optional.empty();
       } else {
-        return null;
+        return Optional.empty();
       }
     } catch (RuntimeException e) {
       throw new SQLException("Mapping failed", e);
@@ -201,7 +202,7 @@ public final class SqlSelect<T> extends SqlCmd {
     }
   }
 
-  public Row firstRow() throws SQLException {
+  public Optional<Row> firstRow() throws SQLException {
     PreparedStatement pst = null;
     ResultSet rs = null;
     try {
@@ -209,9 +210,9 @@ public final class SqlSelect<T> extends SqlCmd {
       if (!isMockMode) {
         pst = toStmt();
         rs = pst.executeQuery();
-        return rs.next() ? toRow(rs) : Row.EMPTY;
+        return rs.next() ? Optional.of(toRow(rs)) : Optional.empty();
       } else {
-        return Row.EMPTY;
+        return Optional.empty();
       }
     } catch (RuntimeException e) {
       throw new SQLException("Mapping failed", e);
@@ -412,9 +413,8 @@ public final class SqlSelect<T> extends SqlCmd {
    *
    * @return new copy of this select
    */
-  @SuppressWarnings("unchecked")
-  public SqlSelect toCopySelect() {
-    SqlSelect s = new SqlSelect(conn, logSql, isMockMode, columns);
+  public SqlSelect<T> toCopySelect() {
+    SqlSelect<T> s = new SqlSelect<>(conn, logSql, isMockMode, columns);
     s.from = this.from;
     s.joins.addAll(this.joins);
     s.where.addAll(this.where);
@@ -426,9 +426,8 @@ public final class SqlSelect<T> extends SqlCmd {
    *
    * @return count version of this select
    */
-  @SuppressWarnings("unchecked")
-  public SqlSelect toCountSelect() {
-    SqlSelect s = new SqlSelect(conn, logSql, isMockMode, "count(1) as cnt");
+  public SqlSelect<Row> toCountSelect() {
+    SqlSelect<Row> s = new SqlSelect<>(conn, logSql, isMockMode, "count(1) as cnt");
     s.from = this.from;
     s.joins.addAll(this.joins);
     s.where.addAll(this.where);
@@ -441,9 +440,14 @@ public final class SqlSelect<T> extends SqlCmd {
    * @return count of returned by this select
    * @throws SQLException if execution of count select fails
    */
-  @SuppressWarnings("ConstantConditions")
   public long countRows() throws SQLException {
-    return isMockMode ? 0L : toCountSelect().firstRow().getLong("cnt");
+//    return isMockMode ? 0L : toCountSelect().firstRow().getLong("cnt");
+    if (isMockMode) {
+      return 0L;
+    } else {
+      Optional<Row> or = toCountSelect().firstRow();
+      return or.isPresent() ? or.get().getLong("cnt") : 0L;
+    }
   }
 
   /**
@@ -483,100 +487,5 @@ public final class SqlSelect<T> extends SqlCmd {
       }
     }
     return sb.toString();
-  }
-
-  private abstract class AbstractJoin {
-    String tab;
-    String id1;
-    String id2;
-
-    private AbstractJoin(String tab, String id1, String id2) {
-      this.tab = tab;
-      this.id1 = id1;
-      this.id2 = id2;
-    }
-
-		abstract String getClause();
-
-    String toSql() {
-      return getClause() + " " + tab + " on " + id1 + " = " + id2;
-    }
-  }
-
-  private class Join extends AbstractJoin {
-    private Join(String tab, String id1, String id2) {
-      super(tab, id1, id2);
-    }
-
-    @Override
-    String getClause() {
-      return "join";
-    }
-  }
-
-  private class InnerJoin extends AbstractJoin {
-    private InnerJoin(String tab, String id1, String id2) {
-      super(tab, id1, id2);
-    }
-
-    @Override
-    String getClause() {
-      return "inner join";
-    }
-  }
-
-  private class LeftJoin extends AbstractJoin {
-    private LeftJoin(String tab, String id1, String id2) {
-      super(tab, id1, id2);
-    }
-
-    @Override
-    String getClause() {
-      return "left join";
-    }
-  }
-
-  private class RightJoin extends AbstractJoin {
-    private RightJoin(String tab, String id1, String id2) {
-      super(tab, id1, id2);
-    }
-
-    @Override
-    String getClause() {
-      return "right join";
-    }
-  }
-
-  private class LeftOuterJoin extends AbstractJoin {
-    private LeftOuterJoin(String tab, String id1, String id2) {
-      super(tab, id1, id2);
-    }
-
-    @Override
-    String getClause() {
-      return "left outer join";
-    }
-  }
-
-  private class RightOuterJoin extends AbstractJoin {
-    private RightOuterJoin(String tab, String id1, String id2) {
-      super(tab, id1, id2);
-    }
-
-    @Override
-    String getClause() {
-      return "right outer join";
-    }
-  }
-
-  private class FullOuterJoin extends AbstractJoin {
-    private FullOuterJoin(String tab, String id1, String id2) {
-      super(tab, id1, id2);
-    }
-
-    @Override
-    String getClause() {
-      return "full outer join";
-    }
   }
 }

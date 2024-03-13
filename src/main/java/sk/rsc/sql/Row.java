@@ -1,8 +1,9 @@
 package sk.rsc.sql;
 
+import java.math.BigDecimal;
 import java.util.*;
 
-import static sk.rsc.sql.Utils.makeAliasIfDotField;
+import static sk.rsc.sql.Utils.*;
 
 /**
  * Row returned by {@link SqlSelect} when no generic class is provided.
@@ -12,6 +13,7 @@ import static sk.rsc.sql.Utils.makeAliasIfDotField;
  */
 public final class Row {
 
+  // todo: https://www.baeldung.com/java-optional
   public static final Row EMPTY = new Row("");
 
   private final String tableName;
@@ -45,42 +47,39 @@ public final class Row {
   }
 
   public Integer getInt(String column) {
-    Object value = getObject(column);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      return ((Number) value).intValue();
-    } else if (value instanceof String) {
-      return Integer.valueOf((String) value);
-    } else {
-      throw new NumberFormatException("Can't convert to integer");
-    }
+    return toInt(getObject(column));
   }
 
   public Long getLong(String column) {
-    Object value = getObject(column);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      return ((Number) value).longValue();
-    } else if (value instanceof String) {
-      return Long.valueOf((String) value);
-    } else {
-      throw new NumberFormatException("Can't convert to long");
-    }
+    return toLong(getObject(column));
+  }
+
+  public Double getDouble(String column) {
+    return toDouble(getObject(column));
+  }
+
+  public BigDecimal getBigDecimal(String column) {
+    return toBigDecimal(getObject(column));
+  }
+
+  public Boolean getBoolean(String column) {
+    return toBool(getObject(column));
   }
 
   public Date getDate(String column) {
-    Object value = getObject(column);
-    if (value == null) {
-      return null;
-    } else if (value instanceof java.sql.Date) {
-      return new Date(((java.sql.Date) value).getTime());
-    } else if (value instanceof java.sql.Timestamp) {
-      return new Date(((java.sql.Timestamp) value).getTime());
-    } else {
-      throw new IllegalArgumentException("Can't convert to date");
+    return toDate(getObject(column), "yyyy-MM-dd");
+  }
+
+  public Date getTimestamp(String column) {
+    return toDate(getObject(column), "yyyy-MM-dd'T'HH:mm:ss");
+  }
+
+  public <E extends Enum<E>> E getEnum(String column, Class<E> enumType) {
+    Map<String, E> map = new HashMap<>(enumType.getEnumConstants().length);
+    for (E e : enumType.getEnumConstants()) {
+      map.put(e.name(), e);
     }
+    return map.get(get(column));
   }
 
   public List<String> listColumns() {
