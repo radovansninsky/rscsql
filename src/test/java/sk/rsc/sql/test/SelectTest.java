@@ -37,8 +37,7 @@ public class SelectTest {
     Sql.setSoutLogger();
 
     conn = DriverManager.getConnection("jdbc:h2:mem:selectdb", "sa", "");
-    Statement stmt = conn.createStatement();
-    try {
+    try (Statement stmt = conn.createStatement()) {
       stmt.executeUpdate(CREATE_TABLE);
       stmt.executeUpdate("insert into test1 (num1, num2) values (1, 1)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (2, 1)");
@@ -67,10 +66,6 @@ public class SelectTest {
       stmt.executeUpdate("insert into test2 (num1, num2) values (5, 107)");
       stmt.executeUpdate("insert into test2 (num1, num2) values (8, 108)");
       stmt.executeUpdate("insert into test2 (num1, num2) values (8, 109)");
-    } finally {
-      if (stmt != null) {
-        stmt.close();
-      }
     }
   }
 
@@ -104,7 +99,7 @@ public class SelectTest {
 
   @Test(enabled = false)
   public void testInVararray() throws SQLException {
-    List list = new Sql(conn, true).select("*").from("test1")
+    List<Row> list = new Sql<>(conn, true).select("*").from("test1")
       .where(Restrictions.in("num2", 1, 2))
       .list();
 
@@ -113,7 +108,7 @@ public class SelectTest {
 
   @Test(enabled = false)
   public void testInList() throws SQLException {
-    List list = new Sql(conn, true).select("*").from("test1")
+    List<Row> list = new Sql<>(conn, true).select("*").from("test1")
       .where(Restrictions.in("num2", Arrays.asList(3, 1)))
       .list();
 
@@ -161,23 +156,23 @@ public class SelectTest {
   @Test(enabled = true)
   public void testSelectedFields() throws SQLException {
     try {
-      new Sql(conn, true).select(Collections.<String>emptyList()).from("test1").list();
+      new Sql<>(conn, true).select(Collections.<String>emptyList()).from("test1").list();
       fail("SQLException should be raised for wrong select syntax!");
-    } catch (SQLException e) {
+    } catch (SQLException ignored) {
     }
   }
 
   @Test
   public void testInSelect() throws SQLException {
-    List<Row> list = new Sql(conn, true).select("*").from("test2")
+    List<Row> list = new Sql<>(conn, true).select("*").from("test2")
       .where(Restrictions.gt("num2", 100))
-      .where(Restrictions.in("num1", new Sql(conn).select("num1").from("test1").where(Restrictions.eq("num2", 3))))
+      .where(Restrictions.in("num1", new Sql<>(conn).select("num1").from("test1").where(Restrictions.eq("num2", 3))))
       .list();
 
     System.out.println("list.size() = " + list.size());
   }
 
-  class Test1Bean {
+  static class Test1Bean {
     String desc;
     Integer num1;
     Date now;

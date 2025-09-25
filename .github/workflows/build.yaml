@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build-server:
+    name: Build server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
+
+      - name: Archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rscsql
+          path: build/libs/rscsql-*.jar
+
+      - name: Archive test result
+        uses: actions/upload-artifact@v4
+        with:
+          name: rscsql-test-report
+          path: |
+            rscsql/build/reports/tests/test
+            rscsql/build/test-results/test
