@@ -5,8 +5,8 @@ on:
     branches: [ "**" ]
 
 jobs:
-  build-server:
-    name: Build server
+  build:
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle Wrapper
-        run: ./gradlew build
+        run: ./gradlew publish
 
       - name: Archive artifact
         uses: actions/upload-artifact@v4
@@ -36,5 +36,5 @@ jobs:
         with:
           name: rscsql-test-report
           path: |
-            rscsql/build/reports/tests/test
-            rscsql/build/test-results/test
+            build/reports/tests/test
+            build/test-results/test
