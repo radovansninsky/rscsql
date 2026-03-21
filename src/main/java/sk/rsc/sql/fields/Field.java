@@ -39,14 +39,14 @@ public class Field {
   }
 
   public void setStmtValue(PreparedStatement stmt, int i) throws SQLException {
-    // todo zavedenie type pre field?
     if (value instanceof Date) {
       setTimestamp(stmt, i, (Date) value);
+    } else if (value instanceof Enum<?>) {
+      stmt.setString(i, ((Enum<?>) value).name());
     } else {
       if (value != null) {
         stmt.setObject(i, value);
       } else {
-//        stmt.setNull(i, Types.VARCHAR);
         stmt.setObject(i, null);
       }
     }
