@@ -3,6 +3,8 @@ package sk.rsc.sql;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 /**
@@ -99,6 +101,23 @@ public final class Utils {
       }
     } else {
       throw new IllegalArgumentException("Can't convert to date");
+    }
+  }
+
+  public static Instant toInstant(Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof java.sql.Date) {
+      return ((java.sql.Date) value)
+        .toLocalDate()
+        .atStartOfDay(ZoneOffset.UTC)
+        .toInstant();
+    } else if (value instanceof java.sql.Timestamp) {
+      return ((java.sql.Timestamp) value).toInstant();
+    } else if (value instanceof String) {
+      return Instant.parse((String)value);
+    } else {
+      throw new IllegalArgumentException("Can't convert to instant");
     }
   }
 }
