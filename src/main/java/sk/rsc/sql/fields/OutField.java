@@ -1,8 +1,11 @@
 package sk.rsc.sql.fields;
 
+import sk.rsc.sql.Utils;
+
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Date;
 
 import static sk.rsc.sql.Utils.toInt;
@@ -53,14 +56,10 @@ public class OutField extends Field {
   }
 
   public Date asDate() {
-    if (value == null) {
-      return null;
-    } else if (value instanceof java.sql.Date) {
-      return new Date(((java.sql.Date)value).getTime());
-    } else if (value instanceof java.sql.Timestamp) {
-      return new Date(((java.sql.Timestamp)value).getTime());
-    } else {
-      throw new IllegalArgumentException("Can't convert to date");
-    }
+    return Utils.toDate(value);
+  }
+
+  public Instant asInstant() {
+    return Utils.toInstant(value);
   }
 }

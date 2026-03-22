@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class InSelectRestriction implements Restriction {
 
-  private String field;
-  private SqlSelect select;
+  private final String field;
+  private final SqlSelect select;
 
   public InSelectRestriction(String field, SqlSelect select) {
     this.field = field;
@@ -23,18 +23,16 @@ public class InSelectRestriction implements Restriction {
 
   @Override
   public boolean hasValues() {
-    return select.listRestrictions().size() > 0;
+    return !select.listRestrictions().isEmpty();
   }
 
   @Override
   public List<Object> getValues() {
-    List<Object> list = new ArrayList<>();
-    list.addAll(select.listRestrictions());
-    return list;
+    return new ArrayList<>(select.listRestrictions());
   }
 
   @Override
   public String toSql() {
-    return new StringBuilder().append(field).append(" in (").append(select.toSql()).append(")").toString();
+    return field + " in (" + select.toSql() + ")";
   }
 }

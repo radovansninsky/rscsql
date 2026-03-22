@@ -79,12 +79,12 @@ public abstract class Mapper<T> {
 
   protected Date getDate(String name) throws SQLException {
     assert name != null : "Field name is null";
-    return toDate(getObject(name), "yyyy-MM-dd");
+    return toDate(getObject(name));
   }
 
   protected Date getTimestamp(String name) throws SQLException {
     assert name != null : "Field name is null";
-    return toDate(getObject(name), "yyyy-MM-dd'T'HH:mm:ss");
+    return toDate(getObject(name));
   }
 
   protected Instant getInstant(String name) throws SQLException {

@@ -2,9 +2,6 @@ package sk.rsc.sql.fields;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Date;
 
 /**
  * Field.
@@ -39,24 +36,10 @@ public class Field {
   }
 
   public void setStmtValue(PreparedStatement stmt, int i) throws SQLException {
-    if (value instanceof Date) {
-      setTimestamp(stmt, i, (Date) value);
-    } else if (value instanceof Enum<?>) {
-      stmt.setString(i, ((Enum<?>) value).name());
+    if (value == null) {
+      stmt.setObject(i, null);
     } else {
-      if (value != null) {
-        stmt.setObject(i, value);
-      } else {
-        stmt.setObject(i, null);
-      }
-    }
-  }
-
-  protected void setTimestamp(PreparedStatement stmt, int i, Date d) throws SQLException {
-    if (d != null) {
-      stmt.setTimestamp(i, new Timestamp(d.getTime()));
-    } else {
-      stmt.setNull(i, Types.TIMESTAMP);
+      stmt.setObject(i, value);
     }
   }
 

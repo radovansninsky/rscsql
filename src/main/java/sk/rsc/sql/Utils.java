@@ -86,19 +86,13 @@ public final class Utils {
     }
   }
 
-  public static Date toDate(Object value, String pattern) {
+  public static Date toDate(Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof java.sql.Date) {
       return new Date(((java.sql.Date) value).getTime());
     } else if (value instanceof java.sql.Timestamp) {
       return new Date(((java.sql.Timestamp) value).getTime());
-    } else if (value instanceof String) {
-      try {
-        return new SimpleDateFormat(pattern).parse((String)value);
-      } catch (ParseException e) {
-        throw new RuntimeException(e);
-      }
     } else {
       throw new IllegalArgumentException("Can't convert to date");
     }

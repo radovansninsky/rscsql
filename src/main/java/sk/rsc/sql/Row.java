@@ -67,11 +67,11 @@ public final class Row {
   }
 
   public Date getDate(String column) {
-    return toDate(getObject(column), "yyyy-MM-dd");
+    return toDate(getObject(column));
   }
 
   public Date getTimestamp(String column) {
-    return toDate(getObject(column), "yyyy-MM-dd'T'HH:mm:ss");
+    return toDate(getObject(column));
   }
 
   public <E extends Enum<E>> E getEnum(String column, Class<E> enumType) {

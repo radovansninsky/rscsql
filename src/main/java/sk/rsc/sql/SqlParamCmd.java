@@ -1,6 +1,7 @@
 package sk.rsc.sql;
 
 import sk.rsc.sql.fields.Field;
+import sk.rsc.sql.fields.Fields;
 import sk.rsc.sql.fields.SqlField;
 
 import java.sql.Connection;
@@ -27,7 +28,7 @@ public abstract class SqlParamCmd extends SqlCmd {
     PreparedStatement pst = null;
     try {
       _log(false);
-      if (!isMockMode  && fields.size() > 0) {
+      if (!isMockMode  && !fields.isEmpty()) {
         pst = toStmt();
         pst.executeUpdate();
       }
@@ -38,10 +39,11 @@ public abstract class SqlParamCmd extends SqlCmd {
   }
 
   public SqlParamCmd set(String field, Object value) {
-    fields.add(new Field(field, value));
+    fields.add(Fields.create(field, value));
     return this;
   }
 
+  @SuppressWarnings("UnusedReturnValue")
   public SqlParamCmd setSql(String field, String value) {
     fields.add(new SqlField(field, value));
     return this;
