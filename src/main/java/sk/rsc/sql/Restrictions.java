@@ -130,11 +130,22 @@ public final class Restrictions {
   /**
    * Arbitrary sql clause with no parameter. Its purpose is to have posibility to write sql clause
    * not covered by build in clauses.
-   * @param text  sql restriction
+   * @param text  sql database native expression
    * @return initialized NativeRestriction
    */
   public static Restriction sql(String text) {
     return new NativeRestriction(text);
+  }
+
+  /**
+   * Arbitrary sql clause with no parameter. Its purpose is to have posibility to write sql clause
+   * not covered by build in clauses.
+   * @param text    sql database native expression with ? placeholders
+   * @param values  values for placeholders
+   * @return initialized NativeRestriction
+   */
+  public static Restriction sql(String text, Object... values) {
+    return new NativeRestriction(text, values);
   }
 
   /**

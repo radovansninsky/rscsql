@@ -6,6 +6,7 @@ import sk.rsc.sql.restrictions.Restriction;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 /**
  * Sql command SELECT ... FROM table JOIN ... WHERE ....
@@ -160,7 +161,9 @@ public final class SqlSelect<T> extends SqlCmd {
   }
 
   public SqlSelect<T> where(List<Restriction> restrictions) {
-    this.where.addAll(restrictions != null ? restrictions : new ArrayList<Restriction>());
+    List<Restriction> list = (restrictions != null ? restrictions : new ArrayList<Restriction>())
+      .stream().filter(Objects::nonNull).collect(Collectors.toList());
+    this.where.addAll(list);
     return this;
   }
 

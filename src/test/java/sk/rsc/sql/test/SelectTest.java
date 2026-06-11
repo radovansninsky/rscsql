@@ -1,8 +1,6 @@
 package sk.rsc.sql.test;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import sk.rsc.sql.Mapper;
 import sk.rsc.sql.Restrictions;
 import sk.rsc.sql.Row;
@@ -32,14 +30,14 @@ public class SelectTest {
 
   private Connection conn;
 
-  @BeforeClass
+  @BeforeTest
   public void setUp() throws SQLException {
     Sql.setSoutLogger();
 
-    conn = DriverManager.getConnection("jdbc:h2:mem:selectdb", "sa", "");
+    conn = DriverManager.getConnection("jdbc:h2:mem:", "sa", "");
     try (Statement stmt = conn.createStatement()) {
       stmt.executeUpdate(CREATE_TABLE);
-      stmt.executeUpdate("insert into test1 (num1, num2) values (1, 1)");
+      stmt.executeUpdate("insert into test1 (num1, num2, desc, now) values (1, 1, 'desc1', null)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (2, 1)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (3, 2)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (4, 3)");
@@ -69,7 +67,7 @@ public class SelectTest {
     }
   }
 
-  @AfterClass
+  @AfterTest
   public void tearDown() {
     if (conn != null) {
       try { conn.close(); } catch (Exception ignored) { }
@@ -77,13 +75,13 @@ public class SelectTest {
   }
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
-  @Test(enabled = false)
-  public void testNoFrom() throws SQLException {
+  @Test()
+  public void testSelectAnyWithoutFromClause() throws SQLException {
     assertEquals(new Sql<Row>(conn, true).select("1").firstRow().get().get("1"), "1");
   }
 
   @Test
-  public void testStartWith() throws SQLException {
+  public void testSelectWithRestrictionStartWith() throws SQLException {
     List<String> list = new Sql<String>(conn, true)
       .select("desc").from("test1").where(Restrictions.startWith("desc", "desc09345"))
       .list(new Mapper<String>() {
@@ -97,8 +95,8 @@ public class SelectTest {
     assertEquals(list.size(), 4);
   }
 
-  @Test(enabled = false)
-  public void testInVararray() throws SQLException {
+  @Test()
+  public void testSelectWithRestrictionInAsVararray() throws SQLException {
     List<Row> list = new Sql<>(conn, true).select("*").from("test1")
       .where(Restrictions.in("num2", 1, 2))
       .list();
@@ -106,8 +104,8 @@ public class SelectTest {
     assertEquals(list.size(), 3);
   }
 
-  @Test(enabled = false)
-  public void testInList() throws SQLException {
+  @Test()
+  public void testSelectWithRestrictionInAsList() throws SQLException {
     List<Row> list = new Sql<>(conn, true).select("*").from("test1")
       .where(Restrictions.in("num2", Arrays.asList(3, 1)))
       .list();
@@ -115,8 +113,8 @@ public class SelectTest {
     assertEquals(list.size(), 5);
   }
 
-  @Test(enabled = false)
-  public void testBefore() throws SQLException {
+  @Test()
+  public void testSelectWithRestrictionBefore() throws SQLException {
     Calendar c = Calendar.getInstance();
     c.set(2015, Calendar.APRIL, 8, 15, 12, 13);
 
@@ -128,8 +126,8 @@ public class SelectTest {
     assertEquals(list.get(0).get("desc"), "1st date");
   }
 
-  @Test(enabled = false)
-  public void testAfter() throws SQLException {
+  @Test()
+  public void testSelectWithRestrictionAfter() throws SQLException {
     Calendar c = Calendar.getInstance();
     c.set(2015, Calendar.APRIL, 8, 15, 12, 13);
 
@@ -141,35 +139,47 @@ public class SelectTest {
     assertEquals(list.get(0).get("desc"), "2nd date");
   }
 
-  @Test(enabled = false)
-  public void testMapperAll() throws SQLException {
-    List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("*").from("test1").list(TEST1BEAN_MAPPER);
+  @Test()
+  public void testSelectStarAsListByMapper() throws SQLException {
+    List<Test1Bean> list = new Sql<Test1Bean>(conn, true)
+      .select("*").from("test1").where(Restrictions.eq("num1", 1))
+      .list(TEST1BEAN_MAPPER);
+
     assertNotNull(list);
+    assertEquals(list.size(), 1);
+    Test1Bean bean1 = list.get(0);
+    assertNotNull(bean1.desc);
+    assertNull(bean1.now);
+    assertNotNull(bean1.num1);
+    assertNotNull(bean1.num2);
+    assertEquals(bean1.num1, 1);
   }
 
-  @Test(enabled = false)
-  public void testMapperSelected() throws SQLException {
+  @Test()
+  public void testSelectNamedFiledAsListByMapper() throws SQLException {
     List<Test1Bean> list = new Sql<Test1Bean>(conn, true).select("desc, num2").from("test1").list(TEST1BEAN_MAPPER);
+
     assertNotNull(list);
+    assertEquals(list.size(), 15);
   }
 
-  @Test(enabled = true)
-  public void testSelectedFields() throws SQLException {
-    try {
-      new Sql<>(conn, true).select(Collections.<String>emptyList()).from("test1").list();
-      fail("SQLException should be raised for wrong select syntax!");
-    } catch (SQLException ignored) {
-    }
+  @Test()
+  public void testSelectNoFieldsAsList() throws SQLException {
+      List<Row> list = new Sql<>(conn, true).select(Collections.<String>emptyList()).from("test1").list();
+
+      assertNotNull(list);
+      assertEquals(list.size(), 15);
   }
 
   @Test
-  public void testInSelect() throws SQLException {
+  public void testSelectWithRestrictionInSelectAsList() throws SQLException {
     List<Row> list = new Sql<>(conn, true).select("*").from("test2")
       .where(Restrictions.gt("num2", 100))
       .where(Restrictions.in("num1", new Sql<>(conn).select("num1").from("test1").where(Restrictions.eq("num2", 3))))
       .list();
 
-    System.out.println("list.size() = " + list.size());
+    assertNotNull(list);
+    assertEquals(list.size(), 4);
   }
 
   static class Test1Bean {

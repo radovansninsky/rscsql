@@ -1,6 +1,7 @@
 package sk.rsc.sql.restrictions;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public final class SimpleRestriction implements Restriction {
 
   @Override
   public List<Object> getValues() {
-    return Arrays.asList(value);
+    return Collections.singletonList(value);
   }
 
   public void setField(String field) {
@@ -53,6 +54,6 @@ public final class SimpleRestriction implements Restriction {
 
   @Override
   public String toSql() {
-    return new StringBuilder().append(field).append(' ').append(op.getOp()).append(" ?").toString();
+    return field + ' ' + op.getOp() + " ?";
   }
 }
