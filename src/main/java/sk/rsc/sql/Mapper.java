@@ -39,7 +39,11 @@ public abstract class Mapper<T> {
   public Object getObject(String name) throws SQLException {
     String n1 = makeAliasIfDotField(name).toLowerCase();
     String n2 = makeAliasIfDotField(tableName + "." + name).toLowerCase();
-    return fields.contains(n1) ? rs.getObject(n1) : fields.contains(n2) ? rs.getObject(n2) : null;
+    String n3 = name.toLowerCase();
+    return fields.contains(n1) ? rs.getObject(n1) :
+      fields.contains(n2) ? rs.getObject(n2) :
+      fields.contains(n3) ? rs.getObject(n3) :
+      null;
   }
 
   protected String get(String name) throws SQLException {

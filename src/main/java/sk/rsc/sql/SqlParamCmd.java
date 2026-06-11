@@ -2,6 +2,7 @@ package sk.rsc.sql;
 
 import sk.rsc.sql.fields.Field;
 import sk.rsc.sql.fields.Fields;
+import sk.rsc.sql.fields.JsonField;
 import sk.rsc.sql.fields.SqlField;
 
 import java.sql.Connection;
@@ -40,6 +41,11 @@ public abstract class SqlParamCmd extends SqlCmd {
 
   public SqlParamCmd set(String field, Object value) {
     fields.add(Fields.create(field, value));
+    return this;
+  }
+
+  public SqlParamCmd setJson(String field, String value) {
+    fields.add(new JsonField(field, value));
     return this;
   }
 

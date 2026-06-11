@@ -5,6 +5,7 @@ import sk.rsc.sql.logging.NoLogger;
 import sk.rsc.sql.logging.SoutLogger;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public final class Sql<T> {
 
   private static String schema = null;
   private static boolean isMockMode = false;
+  private static DbType dbType = DbType.unknown;
 
   private final Connection conn;
   private final boolean logSql;
@@ -31,6 +33,43 @@ public final class Sql<T> {
   public Sql(Connection conn, boolean logSql) {
     this.conn = conn;
     this.logSql = logSql;
+
+    try {
+      DatabaseMetaData metaData = conn.getMetaData();
+      String dbName = metaData.getDatabaseProductName();
+
+      if (dbName.toLowerCase().contains("oracle")) {
+        dbType = DbType.oracle;
+      } else if (dbName.toLowerCase().contains("postgresql")) {
+        dbType = DbType.postgresql;
+      } else if (dbName.toLowerCase().contains("mysql")) {
+        dbType = DbType.mysql;
+      } else if (dbName.toLowerCase().contains("h2")) {
+        dbType = DbType.h2;
+      } else if (dbName.toLowerCase().contains("sql server")) {
+        dbType = DbType.sqlserver;
+      }
+    } catch (Exception ignored) {  }
+  }
+
+  public static boolean isPostgres() {
+    return dbType == DbType.postgresql;
+  }
+
+  public static boolean isOracle() {
+    return dbType == DbType.oracle;
+  }
+
+  public static boolean isMysql() {
+    return dbType == DbType.mysql;
+  }
+
+  public static boolean isH2() {
+    return dbType == DbType.h2;
+  }
+
+  public static boolean isSqlServer() {
+    return dbType == DbType.sqlserver;
   }
 
   static Logger getLogger() {
