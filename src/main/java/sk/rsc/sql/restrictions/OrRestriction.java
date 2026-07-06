@@ -1,7 +1,8 @@
 package sk.rsc.sql.restrictions;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Or Restriction.
@@ -11,11 +12,10 @@ import java.util.List;
  */
 public final class OrRestriction implements Restriction {
 
-  private Restriction a, b;
+  private final Restriction[] items;
 
-  public OrRestriction(Restriction a, Restriction b) {
-    this.a = a;
-    this.b = b;
+  public OrRestriction(Restriction... items) {
+    this.items = items;
   }
 
   @Override
@@ -25,18 +25,14 @@ public final class OrRestriction implements Restriction {
 
   @Override
   public List<Object> getValues() {
-    List<Object> list = new ArrayList<Object>();
-    list.addAll(a.getValues());
-    list.addAll(b.getValues());
-    return list;
+    return Arrays.stream(items).flatMap(r -> r.getValues().stream()).collect(Collectors.toList());
   }
 
   @Override
   public String toSql() {
-    return new StringBuilder()
-      .append("(").append(a.toSql()).append(' ')
-      .append(Op.OR.getOp()).append(" ")
-      .append(b.toSql()).append(")")
-      .toString();
+    return
+      "(" +
+      String.join(" " + Op.OR.getOp() + " ", Arrays.stream(items).map(Restriction::toSql).toArray(String[]::new)) +
+      ")";
   }
 }

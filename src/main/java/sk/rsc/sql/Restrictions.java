@@ -119,12 +119,11 @@ public final class Restrictions {
 
   /**
    * Logical or clause.
-   * @param a  1st restriction
-   * @param b  2nd restriction
+   * @param items  restrictions
    * @return initialized OrRestriction
    */
-  public static Restriction or(Restriction a, Restriction b) {
-    return new OrRestriction(a, b);
+  public static Restriction or(Restriction... items) {
+    return new OrRestriction(items);
   }
 
   /**
