@@ -1,11 +1,15 @@
 package sk.rsc.sql;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Utils.
@@ -113,5 +117,24 @@ public final class Utils {
     } else {
       throw new IllegalArgumentException("Can't convert to instant");
     }
+  }
+
+  public static Object[] toArray(Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof java.sql.Array) {
+      try {
+        return (Object[]) ((java.sql.Array) value).getArray();
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+    } else {
+      throw new IllegalArgumentException("Can't convert to array");
+    }
+  }
+
+  public static List<?> toList(Object value) {
+    Object[] values = toArray(value);
+    return values != null ? Arrays.asList(values) : null;
   }
 }

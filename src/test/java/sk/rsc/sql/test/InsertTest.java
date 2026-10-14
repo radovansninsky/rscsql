@@ -8,6 +8,8 @@ import sk.rsc.sql.Sql;
 import sk.rsc.sql.SqlInsert;
 
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,7 +22,7 @@ import java.util.logging.Logger;
 public class InsertTest {
 
 	private static final String CREATE_TABLE =
-		"create table test1 (id identity, desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2))";
+		"create table test1 (id identity, desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2), tags varchar(64) array)";
 
 	private Connection conn;
 
@@ -78,6 +80,40 @@ public class InsertTest {
 		rs.next();
 		Assert.assertEquals(rs.getInt("id"), id);
 		Assert.assertEquals(rs.getString("desc"), "desc2");
+		rs.close();
+		s.close();
+	}
+
+	@Test
+	public void test3() throws SQLException {
+		new Sql(conn, true).insert("test1")
+			.set("desc", "with tags")
+			.set("tags", "varchar", new String[]{"alpha", "beta", "gamma"})
+			.execute();
+
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery("select * from test1 where desc = 'with tags'");
+		rs.next();
+		Array array = rs.getArray("tags");
+		List<Object> tags = Arrays.asList((Object[]) array.getArray());
+		Assert.assertEquals(tags, Arrays.asList("alpha", "beta", "gamma"));
+		rs.close();
+		s.close();
+	}
+
+	@Test
+	public void test4() throws SQLException {
+		new Sql(conn, true).insert("test1")
+			.set("desc", "with tags list")
+			.set("tags", "varchar", Arrays.asList("one", "two"))
+			.execute();
+
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery("select * from test1 where desc = 'with tags list'");
+		rs.next();
+		Array array = rs.getArray("tags");
+		List<Object> tags = Arrays.asList((Object[]) array.getArray());
+		Assert.assertEquals(tags, Arrays.asList("one", "two"));
 		rs.close();
 		s.close();
 	}

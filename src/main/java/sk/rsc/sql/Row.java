@@ -13,9 +13,6 @@ import static sk.rsc.sql.Utils.*;
  */
 public final class Row {
 
-  // todo: https://www.baeldung.com/java-optional
-  public static final Row EMPTY = new Row("");
-
   private final String tableName;
   private Map<String, Object> nameMap = new HashMap<String, Object>();
 
@@ -72,6 +69,14 @@ public final class Row {
 
   public Date getTimestamp(String column) {
     return toDate(getObject(column));
+  }
+
+  public Object[] getArray(String column) {
+    return toArray(getObject(column));
+  }
+
+  public List<?> getList(String column) {
+    return toList(getObject(column));
   }
 
   public <E extends Enum<E>> E getEnum(String column, Class<E> enumType) {

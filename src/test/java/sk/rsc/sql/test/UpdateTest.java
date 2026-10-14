@@ -9,6 +9,8 @@ import sk.rsc.sql.Restrictions;
 import sk.rsc.sql.Sql;
 
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Tests for Sql update class.
@@ -19,7 +21,7 @@ import java.sql.*;
 public class UpdateTest {
 
 	private static final String CREATE_TABLE =
-		"create table test1 (desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2))";
+		"create table test1 (desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2), tags varchar(64) array)";
 
 	private Connection conn;
 
@@ -77,6 +79,55 @@ public class UpdateTest {
 		ResultSet rs = s.executeQuery("select * from test1 where num1=8");
 		rs.next();
 		Assert.assertNull(rs.getDate("now"));
+		rs.close();
+		s.close();
+	}
+
+	@Test
+	public void test3() throws SQLException {
+		new Sql(conn, true).update("test1")
+			.set("tags", "varchar", new String[]{"x", "y", "z"})
+			.where(Restrictions.eq("num1", 56))
+			.execute();
+
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery("select * from test1 where num1=56");
+		rs.next();
+		Array array = rs.getArray("tags");
+		List<Object> tags = Arrays.asList((Object[]) array.getArray());
+		Assert.assertEquals(tags, Arrays.asList("x", "y", "z"));
+		rs.close();
+		s.close();
+	}
+
+	@Test
+	public void test4() throws SQLException {
+		new Sql(conn, true).update("test1")
+			.set("tags", "varchar", Arrays.asList("a", "b"))
+			.where(Restrictions.eq("num1", 172))
+			.execute();
+
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery("select * from test1 where num1=172");
+		rs.next();
+		Array array = rs.getArray("tags");
+		List<Object> tags = Arrays.asList((Object[]) array.getArray());
+		Assert.assertEquals(tags, Arrays.asList("a", "b"));
+		rs.close();
+		s.close();
+	}
+
+	@Test
+	public void test5() throws SQLException {
+		new Sql(conn, true).update("test1")
+			.set("tags", "varchar", (Object[]) null)
+			.where(Restrictions.eq("num1", 14))
+			.execute();
+
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery("select * from test1 where num1=14");
+		rs.next();
+		Assert.assertNull(rs.getArray("tags"));
 		rs.close();
 		s.close();
 	}

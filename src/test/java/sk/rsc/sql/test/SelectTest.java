@@ -23,7 +23,7 @@ import static org.testng.Assert.*;
 public class SelectTest {
 
   private static final String CREATE_TABLE =
-    "create table test1 (desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2))";
+    "create table test1 (desc varchar(512), num1 integer, now timestamp, num2 numeric(12,2), tags varchar(64) array)";
 
   private static final String CREATE_TABLE_TEST2 =
     "create table test2 (num1 integer, num2 integer)";
@@ -37,7 +37,7 @@ public class SelectTest {
     conn = DriverManager.getConnection("jdbc:h2:mem:", "sa", "");
     try (Statement stmt = conn.createStatement()) {
       stmt.executeUpdate(CREATE_TABLE);
-      stmt.executeUpdate("insert into test1 (num1, num2, desc, now) values (1, 1, 'desc1', null)");
+      stmt.executeUpdate("insert into test1 (num1, num2, desc, now, tags) values (1, 1, 'desc1', null, ARRAY['alpha', 'beta', 'gamma'])");
       stmt.executeUpdate("insert into test1 (num1, num2) values (2, 1)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (3, 2)");
       stmt.executeUpdate("insert into test1 (num1, num2) values (4, 3)");
@@ -169,6 +169,27 @@ public class SelectTest {
 
       assertNotNull(list);
       assertEquals(list.size(), 15);
+  }
+
+  @Test()
+  public void testSelectGetArray() throws SQLException {
+    Row row = new Sql<Row>(conn, true).select("*").from("test1")
+      .where(Restrictions.eq("desc", "desc1"))
+      .firstRow().get();
+
+    Object[] tags = row.getArray("tags");
+
+    assertNotNull(tags);
+    assertEquals(tags, new Object[]{"alpha", "beta", "gamma"});
+  }
+
+  @Test()
+  public void testSelectGetArrayNull() throws SQLException {
+    Row row = new Sql<Row>(conn, true).select("*").from("test1")
+      .where(Restrictions.eq("desc", "2nd date"))
+      .firstRow().get();
+
+    assertNull(row.getArray("tags"));
   }
 
   @Test

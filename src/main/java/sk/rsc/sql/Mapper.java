@@ -105,4 +105,16 @@ public abstract class Mapper<T> {
     }
     return map.get(get(name));
   }
+
+  public Object[] getArray(String name) throws SQLException {
+    assert name != null : "Field name is null";
+
+    return toArray(getObject(name));
+  }
+
+  public List<?> getList(String name) throws SQLException {
+    assert name != null : "Field name is null";
+
+    return toList(getObject(name));
+  }
 }

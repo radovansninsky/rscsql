@@ -40,8 +40,20 @@ public final class SqlUpdate extends SqlParamCmd {
   }
 
   @Override
-  public SqlParamCmd setSql(String field, String value) {
+  public SqlUpdate setSql(String field, String value) {
     super.setSql(field, value);
+    return this;
+  }
+
+  @Override
+  public SqlUpdate set(String field, String type, java.util.Collection<?> values) {
+    super.set(field, type, values);
+    return this;
+  }
+
+  @Override
+  public SqlUpdate set(String field, String type, Object[] values) {
+    super.set(field, type, values);
     return this;
   }
 

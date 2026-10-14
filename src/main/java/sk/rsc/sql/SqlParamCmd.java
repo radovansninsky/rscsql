@@ -1,14 +1,13 @@
 package sk.rsc.sql;
 
-import sk.rsc.sql.fields.Field;
-import sk.rsc.sql.fields.Fields;
-import sk.rsc.sql.fields.JsonField;
-import sk.rsc.sql.fields.SqlField;
+import sk.rsc.sql.fields.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,6 +45,16 @@ public abstract class SqlParamCmd extends SqlCmd {
 
   public SqlParamCmd setJson(String field, String value) {
     fields.add(new JsonField(field, value));
+    return this;
+  }
+
+  public SqlParamCmd set(String field, String type, Collection<?> values) {
+    fields.add(new ArrayField(field, type, values));
+    return this;
+  }
+
+  public SqlParamCmd set(String field, String type, Object[] values) {
+    fields.add(new ArrayField(field, type, values));
     return this;
   }
 
