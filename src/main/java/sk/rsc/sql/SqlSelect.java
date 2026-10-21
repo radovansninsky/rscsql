@@ -4,6 +4,7 @@ import sk.rsc.sql.joins.*;
 import sk.rsc.sql.restrictions.Restriction;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.*;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -394,6 +395,8 @@ public final class SqlSelect<T> extends SqlCmd {
     int i = idx;
     if (val instanceof Date) {
       stmt.setTimestamp(++i, new Timestamp(((Date) val).getTime()));
+    } else if (val instanceof Instant) {
+      stmt.setTimestamp(++i, Timestamp.from((Instant) val));
     } else if (val instanceof Restriction) {
       Restriction r = (Restriction) val;
       if (r.hasValues()) {
