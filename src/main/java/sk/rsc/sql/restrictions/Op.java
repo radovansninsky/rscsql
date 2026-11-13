@@ -19,7 +19,9 @@ public enum Op implements Serializable {
   LT("<"),
   LE("<="),
   LIKE("like"),
+  ILIKE("ilike"),
   NLIKE("not like"),
+  NILIKE("not ilike"),
   ISNULL("is null"),
   ISNOTNULL("is not null"),
   OR("or");

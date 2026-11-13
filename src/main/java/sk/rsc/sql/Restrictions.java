@@ -93,7 +93,27 @@ public final class Restrictions {
    * @return initialized Restriction with like operation
    */
   public static Restriction endWith(String field, String value) {
-    return new SimpleRestriction(field, Op.LIKE, value + "%");
+    return new SimpleRestriction(field, Op.LIKE, "%" + value);
+  }
+
+  /**
+   * Case-insensitive like with arbitrary string at the end clause.
+   * @param field  field
+   * @param value  value
+   * @return initialized Restriction with like operation
+   */
+  public static Restriction iStartWith(String field, String value) {
+    return new SimpleRestriction(field, Op.ILIKE, value + "%");
+  }
+
+  /**
+   * Case-insensitive like with arbitrary string at the start clause.
+   * @param field  field
+   * @param value  value
+   * @return initialized Restriction with like operation
+   */
+  public static Restriction iEndWith(String field, String value) {
+    return new SimpleRestriction(field, Op.ILIKE, "%" + value);
   }
 
   /**
@@ -104,6 +124,16 @@ public final class Restrictions {
    */
   public static Restriction like(String field, String value) {
     return new SimpleRestriction(field, Op.LIKE, "%" + value + "%");
+  }
+
+  /**
+   * Case-insensitive like with arbitrary string at the start and end clause.
+   * @param field  field
+   * @param value  value
+   * @return initialized Restriction with like operation
+   */
+  public static Restriction ilike(String field, String value) {
+    return new SimpleRestriction(field, Op.ILIKE, "%" + value + "%");
   }
 
   /**
